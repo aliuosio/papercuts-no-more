@@ -2,6 +2,14 @@
 
 A document digitization stack where **Scanservjs** captures documents → **Paperless-ngx** processes them with OCR and organizes in a database → **n8n** automates workflows for document processing → **Ollama** provides AI models for intelligent analysis and decision-making.
 
+## Current Status
+
+✅ **All services running and healthy**
+- Paperless-ngx API: Fully operational with 65 documents
+- Custom X-API-Key authentication: Active
+- n8n workflows: Ready for automation
+- Ollama AI models: Available for document analysis
+
 ## Usage Guide
 
 ### Prerequisites
@@ -13,11 +21,11 @@ A document digitization stack where **Scanservjs** captures documents → **Pape
 
 1. Clone this repository `git clone https://github.com/aliuosio/papercuts-nomore.git`
 2. Run `docker-compose up -d`
+3. For custom API authentication: Ensure `.docker/custom-auth/` ownership is set to root:root
 
 ### Accessing Services
 
 - **Paperless-ngx**: <http://localhost:8010> (default login: admin/admin123)
-- **Paperless-ngx API**: <http://localhost:8010/api/> (X-API-Key authentication)
 - **n8n**: <http://localhost:5678>
 - **Scanner Interface**: <http://localhost:8080>
 - **Ollama API**: <http://localhost:11434>
@@ -40,9 +48,7 @@ Paperless-ngx provides a REST API with custom X-API-Key authentication:
 
 Example API call:
 
-```bash
-curl -H "X-API-Key: X3ooteih9th&ae9th0ahoh4ieH#" http://localhost:8010/api/documents/
-```
+    curl -H "X-API-Key: X3ooteih9th&ae9th0ahoh4ieH#" http://localhost:8010/api/documents/
 
 **Note**: This uses custom authentication files in `.docker/custom-auth/` mounted at runtime, allowing use of the official Paperless-NGX image while maintaining API key functionality.
 
@@ -63,3 +69,17 @@ Environment variables are configured in the `.env` file:
 - `./scans`: Scanned documents
 - `./export`: Exported documents
 - `~/Dokumente/Scans`: Host directory for document consumption
+
+## Documentation
+
+- **`codebase.md`**: Complete project overview and architecture documentation
+- **`codebase-overview.md`** (in memory-bank): Authoritative source of truth for current system state
+- **`endpoints.json`**: API endpoint definitions for n8n integration
+- **`.docker/custom-auth/`**: Custom authentication setup for API key functionality
+
+## Development Notes
+
+- Custom API authentication requires `.docker/custom-auth/` files to be owned by root:root
+- Memory-bank MCP stores project insights and current status
+- All services use German language OCR configuration
+- API supports both Token and X-API-Key authentication methods
