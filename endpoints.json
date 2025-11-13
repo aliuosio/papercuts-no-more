@@ -1,0 +1,52 @@
+[
+  {
+    "endpoint": "/documents",
+    "method": "GET",
+    "description": "Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'})."
+  },
+  {
+    "endpoint": "/documents/{id}",
+    "method": "GET",
+    "description": "Retrieves details of a specific document by ID. The ID must be in the endpoint path."
+  },
+  {
+    "endpoint": "/documents/upload",
+    "method": "POST",
+    "description": "Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry)."
+  },
+  {
+    "endpoint": "/documents/{id}/update",
+    "method": "PUT",
+    "description": "Updates an existing document by ID. Use 'body' for the new data."
+  },
+  {
+    "endpoint": "/documents/{id}/delete",
+    "method": "DELETE",
+    "description": "Deletes a document by ID."
+  },
+  {
+    "endpoint": "/labels",
+    "method": "GET",
+    "description": "Retrieves a list of labels (also known as tags in Paperless-ngx)."
+  },
+  {
+    "endpoint": "/labels/{id}",
+    "method": "GET",
+    "description": "Retrieves details of a specific label by ID."
+  },
+  {
+    "endpoint": "/labels/create",
+    "method": "POST",
+    "description": "Creates a new label. Use 'body' for {'name': 'new_label_name'}."
+  },
+  {
+    "endpoint": "/labels/{id}/update",
+    "method": "PUT",
+    "description": "Updates an existing label by ID. Use 'body' for the new data."
+  },
+  {
+    "endpoint": "/labels/{id}/delete",
+    "method": "DELETE",
+    "description": "Deletes a label by ID."
+  }
+]

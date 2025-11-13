@@ -1,0 +1,187 @@
+{
+  "name": "papeercuts-nomore",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        -208
+      ],
+      "id": "2f92cac1-8046-4f21-9790-20d216dc55a4",
+      "name": "Chat",
+      "webhookId": "5aa94780-60e1-40b5-9634-e57d6bc986e2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are \"PaperlessAI,\" a specialized assistant integrated into n8n.\n\n## YOUR MISSION\nYour sole purpose is to help users interact with their Paperless-ngx document management system. You will translate natural language requests (like \"Find my tax documents\") into structured, actionable data for the tool provided to you, which is named **\"Paperless API\"**.\n\n## NOTE\nURL: http://webserver:8000/api/\n\n## YOUR REASONING PROCESS\n1.  **Analyze:** Carefully read the user's request.\n2.  **Consult:** Examine the **\"Paperless API\"** tool's description. This description is your *only* source of truth for which API endpoints exist and what data they need.\n3.  **Decide:**\n    * **If the request is clear:** Your *only* response should be a call to the **\"Paperless API\"** tool, formatted with the exact JSON it requires.\n    * **If the request is ambiguous:** (e.g., \"Find my document\" without a name), you MUST ask the user for the missing information. Do not try to guess.\n\n## CRITICAL RULES\n* **DO NOT** answer in conversational text if you can take an action. Your primary output is a tool call.\n* **DO NOT** make up API endpoints or parameters. If the tool description doesn't list an endpoint, you cannot use it.\n* **DO NOT** hallucinate document IDs, tag IDs, etc. If you need an ID, ask the user for it or find a way to search for it first.\n* **DO NOT** discuss or manage authentication. You must assume the **\"Paperless API\"** tool handles all authentication securely and automatically.\n\n\nNOTE: THIS IS THE URL: http://webserver:8000/API/"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        72,
+        -208
+      ],
+      "id": "98b1c124-4fe8-4aa6-b060-32e4ae6f9a65",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "tableName": "papeercuts_nomore_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        16
+      ],
+      "id": "3caef3db-eb8d-4d15-96d7-1e664abee23e",
+      "name": "Memory",
+      "credentials": {
+        "postgres": {
+          "id": "WB3cXliGZjP0MLMG",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Connect to the paperless-ngx APIto retrieve data with this URL\nhttp://webserver:8000/api/\n\n\n[\n  {\n    \"endpoint\": \"/documents\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'}).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific document by ID. The ID must be in the endpoint path.\"\n  },\n  {\n    \"endpoint\": \"/documents/upload\",\n    \"method\": \"POST\",\n    \"description\": \"Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing document by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a document by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of labels (also known as tags in Paperless-ngx).\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific label by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels/create\",\n    \"method\": \"POST\",\n    \"description\": \"Creates a new label. Use 'body' for {'name': 'new_label_name'}.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing label by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a label by ID.\"\n  }\n]\n\nUse the Qdrant vectore store to retrive information on how to do this.",
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Name', ``, 'string') }}",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        16
+      ],
+      "id": "dcae9b94-3d55-4a82-bdea-a176fa88f743",
+      "name": "Paperless API",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "jONMdeWwFM6rQb1Y",
+          "name": "admin"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        16
+      ],
+      "id": "c3520552-e823-472e-9f03-08357a4c252b",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "model": "mistral-medium",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        16
+      ],
+      "id": "15bff154-5564-409c-aa96-bc5a998e2f4b",
+      "name": "Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "uqEDKUktek4d9CRk",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paperless API": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5fd866ea-c37e-4404-8371-7aa2138b99e2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "abf3f51868d348835d827e20f84938e1e3a9eca5c7a5bed8b5919d962f48e542"
+  },
+  "id": "OVzgf6Ze7pchJV7C",
+  "tags": []
+}

@@ -1,0 +1,92 @@
+services:
+
+  n8n:
+    container_name: ${NAMESPACE}_n8n
+    image: n8nio/n8n:${N8N_VERSION}
+    hostname: n8n
+    pull_policy: always
+    env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n_shared:/files
+    depends_on:
+      - ollama
+      - webserver
+    ports:
+      - 5678:5678
+
+  ollama:
+    image: "ollama/ollama:${OLLAMA_VERSION:-latest}"
+    container_name: "${NAMESPACE:-ollama}_ollama"
+    ports:
+      - "11434:11434"
+    env_file: .env
+    tty: true
+    init: true
+    restart: unless-stopped
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: >
+      "ollama serve & sleep 5 && ollama pull mistral:instruct && wait"
+    volumes:
+      - ~/.ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+
+  broker:
+    container_name: ${NAMESPACE}_broker
+    image: docker.io/library/redis:${REDIS_VERSION}
+    pull_policy: always
+    env_file: .env
+    volumes:
+      - redisdata:/data
+
+  db:
+    container_name: ${NAMESPACE}_db
+    image: docker.io/library/postgres:${POSTGRES_VERSION}
+    pull_policy: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata/_data:/var/lib/postgresql/data
+    env_file: .env
+
+  webserver:
+    container_name: ${NAMESPACE}_webserver
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    pull_policy: always
+    env_file: .env
+    depends_on:
+      - db
+      - broker
+      - scanner
+    ports:
+      - 8010:8000
+    volumes:
+      - ./data/_data:/usr/src/paperless/data
+      - ./scans:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ~/Dokumente/Scans:/usr/src/paperless/consume
+      - ./.docker/custom-auth:/custom-cont-init.d:ro
+
+  scanner:
+    container_name: ${NAMESPACE}_scanner
+    image: sbs20/scanservjs:${SCANNER_VERSION}
+    pull_policy: always
+    env_file: .env
+    privileged: true
+    network_mode: "host"
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
+    ports:
+      - 8080:8080
+
+volumes:
+  redisdata:
+  n8n_data:
