@@ -29,7 +29,7 @@ services:
     pull_policy: always
     entrypoint: [ "/bin/sh", "-c" ]
     command: >
-      "ollama serve & sleep 5 && ollama pull orieg/gemma3-tools:4b && wait"
+      "ollama serve & sleep 5 && ollama pull mistral:instruct && wait"
     volumes:
       - ~/.ollama:/root/.ollama
     deploy:
