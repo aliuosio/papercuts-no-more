@@ -1,0 +1,188 @@
+{
+  "name": "papeercuts-no-more",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6a7538a5-f63d-43d8-8a44-4de5bb6f909e",
+      "name": "Chat",
+      "webhookId": "5aa94780-60e1-40b5-9634-e57d6bc986e2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## PaperlessAI n8n Assistant\n\nYou are **PaperlessAI**, an n8n assistant for **Paperless-ngx** via its **Paperless API**. Your goal is to interpret user requests, execute the correct API calls using the `httprequest` node, and reply with clear, conversational, human-like answers. **Never show your reasoning or raw API JSON output.**\n\n### Tools & Process\n* **Tools:** Use **Paperless API** (`httprequest`) for all actions (list, search, get, create, update, delete). Use **Think** for internal planning only.\n* **Process:**\n    1.  Analyze user intent.\n    2.  Consult the **Paperless API** tool description for endpoints/params.\n    3.  If clear, call **Paperless API**. If unclear, use **Think** and naturally ask the user for missing information.\n    4.  Present a short, natural reply based on the retrieved data.\n\n### Rules\n* Output only the final conversational answer.\n* Do not invent data, endpoints, or IDs.\n* Be concise, friendly, and confident.\n\n### Examples\n* **User:** “How many documents are in my system?”\n* **You:** “There are 65 documents in your Paperless-ngx system.”\n\n* **User:** “Find my tax receipts from 2023.”\n* **You:** “I found two documents tagged ‘tax’ from 2023: *TaxReturn2023.pdf* and *Receipts2023.zip*.”\n\n* **User:** “Open my latest electricity bill.”\n* **You:** “Sure! Could you tell me which month or file name to look for?”\n\n## NOTE\n\nURL: http://webserver:8010/api/\nDISPLAY THE URL YOU USED IN YOUR ERROR MESSAGE if you can not connect\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        352,
+        0
+      ],
+      "id": "11259e37-324b-46a8-87d1-eff52332bcfe",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "tableName": "papeercuts_no_more_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "2441e009-0844-4588-9a27-04ca7c4594e4",
+      "name": "Memory",
+      "credentials": {
+        "postgres": {
+          "id": "XkcWB7ltpKqN0iMx",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "[\n  {\n    \"endpoint\": \"/documents\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of documents. Use 'query' parameter to search (e.g. ?query=invoice).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific document. Replace {id} with the document ID.\"\n  },\n  {\n    \"endpoint\": \"/tags\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of all available tags/labels.\"\n  }\n]",
+        "url": "http://webserver:8010/api/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "X3ooteih9th&ae9th0ahoh4ieH#"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Name', ``, 'string') }}",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        224
+      ],
+      "id": "5b3d10b8-6fd1-4acd-bf2d-fdf8143ab866",
+      "name": "Paperless API"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        608,
+        224
+      ],
+      "id": "7ec4740f-d839-4b81-9ce0-61c7a697dcf6",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "model": "mistral-medium",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "0ff3e533-f601-41ad-b8a0-d07339a0d210",
+      "name": "Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "yW4N9swzlHupMhS0",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paperless API": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cf6433ab-b8cb-4b8c-a75c-ad2dbfc0a5e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "99485a0a9adc2e08706a6cf4a2cbb4af8f7d9cad78f573c676b177fef9ec0f1f"
+  },
+  "id": "QD70ayXSHBvzk26e",
+  "tags": []
+}
