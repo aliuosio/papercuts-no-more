@@ -19,7 +19,7 @@ services:
 
   ollama:
     image: "ollama/ollama:${OLLAMA_VERSION:-latest}"
-    container_name: "${NAMESPACE:-ollama}_ollama"
+    container_name: "${NAMESPACE}_ollama"
     ports:
       - "11434:11434"
     env_file: .env
