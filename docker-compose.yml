@@ -26,18 +26,20 @@ services:
     tty: true
     init: true
     restart: unless-stopped
+    pull_policy: always
     entrypoint: [ "/bin/sh", "-c" ]
     command: >
-      "ollama serve & sleep 5 && ollama pull mistral:instruct && wait"
+      "ollama serve & sleep 5 && ollama pull orieg/gemma3-tools:4b && wait"
     volumes:
       - ~/.ollama:/root/.ollama
     deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
+     resources:
+       reservations:
+         devices:
+           - driver: ${OLLAMA_GPU_DRIVER-nvidia}
+             count: 1
+             capabilities:
+               - gpu
 
   broker:
     container_name: ${NAMESPACE}_broker
