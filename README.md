@@ -39,6 +39,7 @@ Paperless-ngx provides a REST API with custom X-API-Key authentication:
 - **Usage**: Include `X-API-Key: <your-api-key>` header in requests
 
 Example API call:
+
 ```bash
 curl -H "X-API-Key: X3ooteih9th&ae9th0ahoh4ieH#" http://localhost:8010/api/documents/
 ```
