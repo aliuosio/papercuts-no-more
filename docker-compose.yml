@@ -10,7 +10,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./n8n_shared:/files
+      - ./n8n_shared:/home/node/.n8n/workflows
     depends_on:
       - ollama
       - webserver
