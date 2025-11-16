@@ -1,5 +1,60 @@
-services:
+x-ollama-base: &ollama-base
+  image: "alpine/ollama:${OLLAMA_VERSION:-latest}"
+  container_name: "${NAMESPACE}_ollama"
+  ports:
+    - "11434:11434"
+  env_file: .env
+  tty: true
+  init: true
+  restart: unless-stopped
+  pull_policy: always
+  entrypoint: [ "/bin/sh", "-c" ]
+  command: >
+    "ollama serve & sleep 5 && ollama pull mistral:instruct && wait"
+  volumes:
+    - ~/.ollama:/root/.ollama
 
+x-ollama-gpu-deploy: &ollama-gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - count: 1
+            capabilities:
+              - gpu
+
+services:
+  
+  ollama:
+    <<: *ollama-base
+    profiles:
+      - cpu
+
+  ollama-nvidia:
+    <<: [*ollama-base, *ollama-gpu-deploy]
+    profiles:
+      - nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: ${OLLAMA_GPU_DRIVER:-nvidia}
+              count: 1
+              capabilities:
+                - gpu
+
+  ollama-amd:
+    <<: [*ollama-base, *ollama-gpu-deploy]
+    profiles:
+      - amd
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: ${OLLAMA_AMD_DRIVER:-k8s.io/rocm}
+              count: 1
+              capabilities:
+                - gpu
   n8n:
     container_name: ${NAMESPACE}_n8n
     image: n8nio/n8n:${N8N_VERSION}
@@ -12,34 +67,10 @@ services:
       - n8n_data:/home/node/.n8n
       - ./n8n_shared:/home/node/.n8n/workflows
     depends_on:
-      - ollama
-      - webserver
+      webserver:
+        condition: service_healthy
     ports:
       - 5678:5678
-
-  ollama:
-    image: "ollama/ollama:${OLLAMA_VERSION:-latest}"
-    container_name: "${NAMESPACE}_ollama"
-    ports:
-      - "11434:11434"
-    env_file: .env
-    tty: true
-    init: true
-    restart: unless-stopped
-    pull_policy: always
-    entrypoint: [ "/bin/sh", "-c" ]
-    command: >
-      "ollama serve & sleep 5 && ollama pull mistral:instruct && wait"
-    volumes:
-      - ~/.ollama:/root/.ollama
-    deploy:
-     resources:
-       reservations:
-         devices:
-           - driver: ${OLLAMA_GPU_DRIVER-nvidia}
-             count: 1
-             capabilities:
-               - gpu
 
   broker:
     container_name: ${NAMESPACE}_broker
@@ -58,6 +89,11 @@ services:
     volumes:
       - ./pgdata/_data:/var/lib/postgresql/data
     env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h db -p 5432 -U ${POSTGRES_USER:-paperless}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   webserver:
     container_name: ${NAMESPACE}_webserver
@@ -65,9 +101,10 @@ services:
     pull_policy: always
     env_file: .env
     depends_on:
-      - db
-      - broker
-      - scanner
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
     ports:
       - 8010:8000
     volumes:
@@ -76,6 +113,11 @@ services:
       - ./export:/usr/src/paperless/export
       - ~/Dokumente/Scans:/usr/src/paperless/consume
       - ./.docker/custom-auth:/custom-cont-init.d:ro
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   scanner:
     container_name: ${NAMESPACE}_scanner
