@@ -1,0 +1,229 @@
+{
+  "name": "papeercuts-no-more",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6a7538a5-f63d-43d8-8a44-4de5bb6f909e",
+      "name": "Chat",
+      "webhookId": "5aa94780-60e1-40b5-9634-e57d6bc986e2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Chat').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "## PaperlessAI n8n Assistant\n\nYou are **PaperlessAI**, an n8n assistant for **Paperless-ngx** via its **Paperless API**. Your goal is to interpret user requests, execute the correct API calls using the `httprequest` node, and reply with clear, conversational, human-like answers. **Never show your reasoning or raw API JSON output.**\n\n### Tools & Process\n* **Tools:** Use **Paperless API** (`httprequest`) for all actions (list, search, get, create, update, delete). Use **Think** for internal planning only.\n* **Process:**\n    1.  Analyze user intent.\n    2.  Consult the **Paperless API** tool description for endpoints/params.\n    3.  If clear, call **Paperless API**. If unclear, use **Think** and naturally ask the user for missing information.\n    4.  Present a short, natural reply based on the retrieved data.\n\n### Rules\n* Output only the final conversational answer.\n* Do not invent data, endpoints, or IDs.\n* Be concise, friendly, and confident.\n\n### Examples\n* **User:** “How many documents are in my system?”\n* **You:** “There are 65 documents in your Paperless-ngx system.”\n\n* **User:** “Find my tax receipts from 2023.”\n* **You:** “I found two documents tagged ‘tax’ from 2023: *TaxReturn2023.pdf* and *Receipts2023.zip*.”\n\n* **User:** “Open my latest electricity bill.”\n* **You:** “Sure! Could you tell me which month or file name to look for?”"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        576,
+        0
+      ],
+      "id": "11259e37-324b-46a8-87d1-eff52332bcfe",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "tableName": "papeercuts_no_more_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        224
+      ],
+      "id": "2441e009-0844-4588-9a27-04ca7c4594e4",
+      "name": "Memory",
+      "credentials": {
+        "postgres": {
+          "id": "jK6lnPEtH2yP5xxL",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "[\n  {\n    \"endpoint\": \"/documents\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'}).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific document by ID. The ID must be in the endpoint path.\"\n  },\n  {\n    \"endpoint\": \"/documents/upload\",\n    \"method\": \"POST\",\n    \"description\": \"Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing document by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a document by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of labels (also known as tags in Paperless-ngx).\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific label by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels/create\",\n    \"method\": \"POST\",\n    \"description\": \"Creates a new label. Use 'body' for {'name': 'new_label_name'}.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing label by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a label by ID.\"\n  }\n]",
+        "url": "={{ $('SetVars').item.json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "X3ooteih9th&ae9th0ahoh4ieH#"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Name', ``, 'string') }}",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        704,
+        224
+      ],
+      "id": "5b3d10b8-6fd1-4acd-bf2d-fdf8143ab866",
+      "name": "Paperless API"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        224
+      ],
+      "id": "7ec4740f-d839-4b81-9ce0-61c7a697dcf6",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "model": "mistral:instruct",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        448,
+        224
+      ],
+      "id": "0790b578-66f7-4bda-9d9d-ca70b7355c25",
+      "name": "Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "pPG9wEYOMyJQExsm",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "88283c79-5602-4553-a907-655533246911",
+              "name": "url",
+              "value": "http://webserver:8010/api/",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a8fcdcf8-907d-4fb1-ac3b-bc9a11f951ff",
+      "name": "SetVars"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "SetVars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paperless API": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SetVars": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dc37d123-f2cc-41fb-b30d-cc577775d240",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d4e3efaf413113ce6041187dd692fd8ad982d357cab677a500fc2f3a144e7f65"
+  },
+  "id": "QD70ayXSHBvzk26e",
+  "tags": []
+}
