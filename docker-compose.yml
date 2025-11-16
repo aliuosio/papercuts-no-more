@@ -6,13 +6,18 @@ x-ollama-base: &ollama-base
   env_file: .env
   tty: true
   init: true
-  restart: unless-stopped
   pull_policy: always
   entrypoint: [ "/bin/sh", "-c" ]
   command: >
     "ollama serve & sleep 5 && ollama pull mistral:instruct && wait"
   volumes:
     - ~/.ollama:/root/.ollama
+  healthcheck:
+    test: ["CMD-SHELL", "nc -w 2 -z localhost 11434"]
+    start_period: 1m
+    interval: 30s
+    timeout: 5s
+    retries: 3
 
 x-ollama-gpu-deploy: &ollama-gpu-deploy
   deploy:
@@ -79,6 +84,12 @@ services:
     env_file: .env
     volumes:
       - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     container_name: ${NAMESPACE}_db
@@ -114,7 +125,7 @@ services:
       - ~/Dokumente/Scans:/usr/src/paperless/consume
       - ./.docker/custom-auth:/custom-cont-init.d:ro
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "8000"]
+      test: ["CMD", "python", "-c", "import socket,sys; s=socket.socket(); s.settimeout(2); rc=s.connect_ex(('127.0.0.1',8000)); s.close(); sys.exit(0 if rc==0 else 1)"]
       interval: 10s
       timeout: 5s
       retries: 5
