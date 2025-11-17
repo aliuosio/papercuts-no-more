@@ -1,5 +1,5 @@
 .vscode/settings.json
-consume
+consume/*
 !consume/**/.gitkeep
 data/*
 !data/**/.gitkeep
