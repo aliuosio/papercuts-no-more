@@ -48,18 +48,6 @@ services:
               capabilities:
                 - gpu
 
-  ollama-amd:
-    <<: [*ollama-base, *ollama-gpu-deploy]
-    profiles:
-      - amd
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: ${OLLAMA_AMD_DRIVER:-k8s.io/rocm}
-              count: 1
-              capabilities:
-                - gpu
   n8n:
     container_name: ${NAMESPACE}_n8n
     image: n8nio/n8n:${N8N_VERSION}

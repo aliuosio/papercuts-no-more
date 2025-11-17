@@ -83,3 +83,44 @@ Environment variables are configured in the `.env` file:
 - Memory-bank MCP stores project insights and current status
 - All services use German language OCR configuration
 - API supports both Token and X-API-Key authentication methods
+
+## Architecture
+
+- **Webserver (Paperless-ngx)**: Document management API and web interface on port 8010
+- **n8n**: Workflow automation platform on port 5678
+- **Ollama**: Local AI model server on port 11434 with configurable GPU support (Nvidia, AMD, CPU)
+- **Database**: PostgreSQL for data storage
+- **Broker**: Redis for caching and message queuing
+- **Scanner**: Scanservjs for document scanning
+
+## Key Components
+
+- Docker Compose setup with multiple services
+- Environment configuration in .env
+- API endpoints defined in endpoints.json for n8n integration
+- Shared directory for n8n files
+- Custom API key authentication via .docker/custom-auth/
+
+## Ollama GPU Configuration
+
+Ollama supports different GPU configurations through Docker Compose override files:
+
+- **Nvidia GPU**: Default configuration using NVIDIA Container Toolkit (driver: nvidia)
+- **AMD GPU**: Uses ROCm image (ollama/ollama:rocm) with device access to /dev/kfd and /dev/dri
+- **CPU Only**: No GPU acceleration, runs on CPU
+
+### Usage
+
+- Nvidia: `docker-compose up` (default)
+- AMD: `docker-compose -f docker-compose.yml -f docker-compose.amd.yml up`
+- CPU: `docker-compose -f docker-compose.yml -f docker-compose.cpu.yml up`
+
+## API Details
+
+- Paperless-ngx API uses Token authentication or custom X-API-Key authentication
+- Base URL: http://localhost:8010/api/
+- Supported endpoints: documents, labels, upload, etc.
+- API key configured in environment: X3ooteih9th&ae9th0ahoh4ieH#
+- Authentication methods:
+  - Token: POST /api/token/ with username/password, then Authorization: Token <token>
+  - API Key: X-API-Key: <PAPERLESS_API_KEY>
