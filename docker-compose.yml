@@ -99,6 +99,7 @@ services:
       - "5432:5432"
     volumes:
       - ./pgdata/_data:/var/lib/postgresql/data
+      - ./.docker/postgres/pg-init.sql:/docker-entrypoint-initdb.d/99-clear-collations.sql
     env_file: .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h db -p 5432 -U ${POSTGRES_USER:-paperless}"]
@@ -123,7 +124,7 @@ services:
       - ./scans:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
       - ~/Dokumente/Scans:/usr/src/paperless/consume
-      - ./.docker/custom-auth:/custom-cont-init.d:ro
+      - ./.docker/webserver/custom-auth:/custom-cont-init.d:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import socket,sys; s=socket.socket(); s.settimeout(2); rc=s.connect_ex(('127.0.0.1',8000)); s.close(); sys.exit(0 if rc==0 else 1)"]
       interval: 10s
