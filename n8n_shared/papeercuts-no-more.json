@@ -46,7 +46,7 @@
       "name": "Memory",
       "credentials": {
         "postgres": {
-          "id": "jK6lnPEtH2yP5xxL",
+          "id": "9YHWrQHXIQc9v806",
           "name": "Postgres account"
         }
       }
@@ -97,7 +97,7 @@
     },
     {
       "parameters": {
-        "model": "mistral:instruct",
+        "model": "qwen3:8b",
         "options": {
           "temperature": 0.1
         }
@@ -112,7 +112,7 @@
       "name": "Ollama",
       "credentials": {
         "ollamaApi": {
-          "id": "pPG9wEYOMyJQExsm",
+          "id": "Oef5Jayg2meXmmNg",
           "name": "Ollama account"
         }
       }
@@ -219,10 +219,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "0060ac32-0f26-4c53-a52e-a5e7513f43f5",
+  "versionId": "bed936c7-7300-4a81-bc42-b7b9189f4ab3",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "cbd887b54afbab5db06216333fe1e5725d7ea63bbca3dcd727d1a5b8eca54fa3"
+    "instanceId": "57e9dc867d784dfc9996947c2f7aef7019a77f9068a2f93b88c08d8087c96bd9"
   },
   "id": "QD70ayXSHBvzk26e",
   "tags": []
