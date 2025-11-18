@@ -126,6 +126,8 @@ services:
     image: sbs20/scanservjs:${SCANNER_VERSION}
     pull_policy: always
     env_file: .env
+    volumes:
+      - ./.docker/webserver/volumes/consume:/var/lib/scanservjs/output
     privileged: true
     network_mode: "host"
     devices:
