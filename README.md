@@ -2,14 +2,6 @@
 
 A document digitization stack where **Scanservjs** captures documents → **Paperless-ngx** processes them with OCR and organizes in a database → **n8n** automates workflows for document processing → **Ollama** provides AI models for intelligent analysis and decision-making.
 
-## Current Status
-
-✅ **All services running and healthy**
-- Paperless-ngx API: Fully operational with 65 documents
-- Custom X-API-Key authentication: Active
-- n8n workflows: Ready for automation
-- Ollama AI models: Available for document analysis
-
 ## Usage Guide
 
 ### Prerequisites
@@ -20,7 +12,8 @@ A document digitization stack where **Scanservjs** captures documents → **Pape
 ### Setup
 
 1. Clone this repository `git clone https://github.com/aliuosio/papercuts-nomore.git`
-2. Run `docker-compose up -d`
+2. Startup
+`docker compose --profile nvidia up -d (to use nvidia GPU)` or `docker compose (to use CPU)`
 3. For custom API authentication: Ensure `.docker/custom-auth/` ownership is set to root:root
 
 ### Accessing Services
