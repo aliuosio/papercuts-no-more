@@ -1,6 +1,6 @@
 .vscode/settings.json
-pgdata/*
-!pgdata/**/.gitkeep
+.docker/postgres/pgdata/*
+!.docker/postgres/pgdata/.gitkeep
 .docker/webserver/volumes/consume/*
 !.docker/webserver/volumes/consume/.gitkeep
 .docker/webserver/volumes/data/*

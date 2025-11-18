@@ -88,7 +88,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./pgdata/_data:/var/lib/postgresql/data
+      - ./.docker/postgres/pgdata/_data:/var/lib/postgresql/data
       - ./.docker/postgres/pg-init.sql:/docker-entrypoint-initdb.d/99-clear-collations.sql
     env_file: .env
     healthcheck:
