@@ -14,7 +14,6 @@ A document digitization stack where **Scanservjs** captures documents → **Pape
 1. Clone this repository `git clone https://github.com/aliuosio/papercuts-nomore.git`
 2. Startup
 `docker compose --profile nvidia up -d (to use nvidia GPU)` or `docker compose (to use CPU)`
-3. For custom API authentication: Ensure `.docker/custom-auth/` ownership is set to root:root
 
 ### Accessing Services
 
@@ -31,6 +30,29 @@ A document digitization stack where **Scanservjs** captures documents → **Pape
 4. Create automated workflows in n8n to process documents (OCR, categorization, notifications, etc.)
 5. Leverage Ollama for AI-powered document analysis and processing
 
+### Pre-configured n8n Workflow
+
+On docker-compose startup, a workflow is automatically imported into n8n. This includes a chat interface that uses Ollama's AI model to communicate with the paperless-ngx API, enabling natural language queries of your document database.
+
+**Example query:** "What documents were added in October about insurance?"
+
+The chat analyzes your questions and queries the paperless-ngx API to retrieve relevant documents based on content, metadata, dates, and tags.
+
+#### Ollama Chat Model Configuration
+
+The n8n workflow includes an Ollama Chat Model node that powers the AI assistant. Configure it as follows:
+
+**Base URL Configuration:**
+- When using NVIDIA GPU profile (`docker compose --profile nvidia up -d`): Set the Base URL to `http://ollama-nvidia:11434`
+- When using CPU profile (`docker compose up -d`): Set the Base URL to `http://ollama:11434`
+
+**Model Selection:**
+The docker-compose.yml automatically pulls the `qwen3:8b` model. In the Ollama Chat Model node within n8n:
+1. Open the workflow editor
+2. Select the Ollama Chat Model node (likely named "Ollama" or similar)
+3. Ensure the Base URL is set as above depending on your profile
+4. Select `qwen3:8b` from the model dropdown menu
+
 ### API Authentication
 
 Paperless-ngx provides a REST API with custom X-API-Key authentication:
@@ -38,12 +60,6 @@ Paperless-ngx provides a REST API with custom X-API-Key authentication:
 - **API Key**: Configured via `PAPERLESS_API_KEY` environment variable in `.env`
 - **Change API Key**: Update the `PAPERLESS_API_KEY` value in `.env` and restart containers
 - **Usage**: Include `X-API-Key: <your-api-key>` header in requests
-
-Example API call:
-
-    curl -H "X-API-Key: X3ooteih9th&ae9th0ahoh4ieH#" http://localhost:8010/api/documents/
-
-**Note**: This uses custom authentication files in `.docker/custom-auth/` mounted at runtime, allowing use of the official Paperless-NGX image while maintaining API key functionality.
 
 ### Configuration
 
