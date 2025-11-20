@@ -9,7 +9,7 @@ x-ollama-base: &ollama-base
   pull_policy: always
   entrypoint: [ "/bin/sh", "-c" ]
   command: >
-    "ollama serve & sleep 5 && ollama pull qwen3:8b && wait"
+    "ollama serve & sleep 5 && ollama pull qwen3:8b && ollama pull mistral:instruct && ollama pull llama3.2:3b && wait"
   volumes:
     - ~/.ollama:/root/.ollama
   healthcheck:
@@ -65,7 +65,7 @@ services:
     ports:
       - 5678:5678
     entrypoint: ["/bin/sh", "-c"]
-    command: ["n8n import:workflow --input=/home/node/.n8n/workflows/papeercuts-no-more-multi-agents && n8n"]
+    command: ["n8n import:workflow --input=/home/node/.n8n/workflows/papeercuts-no-more-multi-agents.json && n8n"]
 
   broker:
     container_name: ${NAMESPACE}_broker
