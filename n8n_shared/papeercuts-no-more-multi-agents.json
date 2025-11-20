@@ -1,0 +1,495 @@
+{
+  "name": "papeercuts-no-more-multi-agents",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "chat-trigger",
+      "name": "Chat",
+      "webhookId": "b402c26c-b648-4b8a-a74f-a28a9e8ec898"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:3b",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        0,
+        336
+      ],
+      "id": "ollama-small",
+      "name": "Ollama Small",
+      "credentials": {
+        "ollamaApi": {
+          "id": "zA9qEwAA2G4sAb1v",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Chat').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "**Role:** Intent and Language Analyzer.\n**Tools:**\n- **Think:** Use this tool for internal planning, analysis, and extracting key components before generating the final JSON output.\n**Task:**\n1. Use the **Think Intent** tool to analyze the user's request.\n2. Determine the core action (intent) and the language used.\n3. Extract 3-5 high-value keywords relevant to Paperless-ngx (e.g., tags, dates, file names).\n4. Output the result ONLY as a single JSON object.\n\n**Output Format:** Return ONLY a single JSON object.\n\n**Schema:**\n{\n    \"intent\": \"The main action the user wants (e.g., 'list', 'search', 'get_document', 'create', 'update', 'delete').\",\n    \"language_code\": \"The ISO 639-1 code of the user's language (e.g., 'en', 'de', 'fr').\",\n    \"keywords\": [\n        \"A list of 3-5 high-value nouns, years, or tags from the request.\"\n    ]\n}\n\n**Example Interaction:**\nUser: \"How many documents are in my system?\"\nThought: I need to detect the language (English), the intent (list/count), and extract no relevant keywords.\nAction: {\"intent\": \"list\", \"language_code\": \"en\", \"keywords\": [\"documents\", \"count\"]}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        288,
+        0
+      ],
+      "id": "agent-intent",
+      "name": "Intent & Language Detector"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:8b",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        0,
+        544
+      ],
+      "id": "ollama-main",
+      "name": "Ollama Main",
+      "credentials": {
+        "ollamaApi": {
+          "id": "zA9qEwAA2G4sAb1v",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "**Role:** Paperless-ngx API Path Planner.\n\n**Tools:**\n- **Think API:** Use this tool for internal planning and reasoning.\n- **Paperless-ngx API Endpoints:** This tool provides the structured JSON array of available Paperless-ngx REST endpoints, methods, and descriptions.\n\n**Task:**\n1. **Analyze:** Use the **Think API** tool to analyze the user's `intent` and `keywords` (provided in the input context).\n2. **Consult:** Use the **Paperless-ngx API Endpoints** tool to find the matching endpoint and method.\n3. **Construct:** Build the final API path string.\n    * **Rule A:** The path MUST start with `/api`.\n    * **Rule B (Search/List):** If the intent is searching or listing, use the `/documents` endpoint. Convert keywords into a URL query parameter (e.g., `?query=tax+2023`).\n    * **Rule C (Specific IDs):** If the intent targets a specific document (get, delete, update), substitute the `{id}` placeholder in the endpoint path with the actual ID found in the keywords.\n4. **Output:** Generate the final result as a strictly formatted JSON object.\n\n**Output Schema:**\n{\n    \"api_path\": \"The complete REST path (e.g., '/api/documents/?query=invoice' or '/api/documents/102/delete').\",\n    \"method\": \"The HTTP method (GET, POST, PUT, DELETE).\"\n}\n\n**Critical Formatting Rules:**\n- Use the tools for all thinking and lookups.\n- The **Final Answer** must be **ONLY** the raw JSON object.\n- Start your final response with `{` and end it with `}`.\n- Do not wrap the JSON in markdown (no ```json blocks).\n- Do not add conversational text like \"Here is the JSON\".\n\n**Example Interaction:**\nInput: {\"intent\": \"search\", \"keywords\": [\"tax\", \"2024\"]}\nThought (via Tool): I need to search. Checking endpoints... found /documents. I need to add the query param and the /api prefix.\nFinal Answer: { \"api_path\": \"/api/documents/?query=tax+2024\", \"method\": \"GET\" }"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        752,
+        0
+      ],
+      "id": "agent-planner",
+      "name": "API Path & Parameter Planner"
+    },
+    {
+      "parameters": {
+        "method": "={{ $json.method }}",
+        "url": "=http://webserver:8000{{ $json.api_path }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Basic YWRtaW46YWRtaW4xMjM="
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1376,
+        0
+      ],
+      "id": "api-executor",
+      "name": "API Executor"
+    },
+    {
+      "parameters": {
+        "model": "mistral:instruct",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        0,
+        752
+      ],
+      "id": "ollama-summary",
+      "name": "Ollama Summarizer",
+      "credentials": {
+        "ollamaApi": {
+          "id": "zA9qEwAA2G4sAb1v",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "User Language: {{ $json.stringify($('Intent & Language Detector').item.json.language) }}\nAPI Response: {{ $('API Executor').item.body.text }}",
+        "options": {
+          "systemMessage": "**Role:** Paperless-ngx Final Answer Summarizer and Translator.\n**Tools:**\n- **Think Summarizer:** Use this tool to interpret the raw JSON response, determine what information needs to be extracted (count, titles, error message), and plan the translation into the required language.\n**Task:**\n1. Use the **Think** tool to analyze the raw API JSON and the intended language.\n2. Generate a single, concise, and friendly final answer based ONLY on the API results.\n3. The final answer MUST be in the specified language code.\n4. If the JSON indicates success, report the relevant data. If it indicates an error or empty result, report this politely.\n5. **DO NOT SHOW THE THINKING PROCESS OR RAW JSON.**\n\n**Output Format:** Return ONLY the final natural language response.\n\n**Input Language Code:** [Value of language_code from Agent 1]\n**Input API Response (JSON):** [Raw JSON from Agent 3]\n\n**Example Interaction:**\nInput Language Code: en\nInput API Response (JSON): {\"count\": 65, \"next\": null, \"previous\": null, \"results\": [...]}\nThought: The response is a document list with a count of 65. I must summarize this as a simple confirmation in English.\nAction: There are 65 documents in your Paperless-ngx system.",
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "agent-summarizer",
+      "name": "Summarizer & Translator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "8ae97106-b2e1-4a0a-a308-7eb37ced7acb",
+      "name": "Think Intent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        224
+      ],
+      "id": "03e145cf-8efc-4ed2-bf89-b1f8a360f1d2",
+      "name": "Think API"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        224
+      ],
+      "id": "7a7ab61c-3565-4e3b-a2e5-4d99139c75dd",
+      "name": "Think Summarizer"
+    },
+    {
+      "parameters": {
+        "description": "Paperless-ngx REST API Documentation (JSON Reference).\n\nThis tool provides a structured JSON array containing all available Paperless-ngx API endpoints, their corresponding HTTP methods (GET, POST, PUT, DELETE), and a list of supported_intents.\n\nAgent 2 (Planner) Must Use:\n\n    Match the user's intent to an entry's supported_intents.\n\n    Use the associated endpoint (e.g., /documents) and method to construct the final API request path.\n\n    Crucially: The final path passed to the HTTP Request Executor must be prefixed with /api (e.g., /api/documents).",
+        "jsCode": "// Example: convert the incoming query to uppercase and return it\n[\n  {\n    \"action_name\": \"LIST_OR_SEARCH_DOCUMENTS\",\n    \"description\": \"Retrieves a list of documents. Can be used for simple listing (count) or detailed searching/filtering.\",\n    \"endpoint\": \"/documents\",\n    \"method\": \"GET\",\n    \"required_params\": [\"query_optional\"],\n    \"supported_intents\": [\"list\", \"count\", \"search\", \"find\", \"filter\"]\n  },\n  {\n    \"action_name\": \"GET_DOCUMENT_DETAILS_BY_ID\",\n    \"description\": \"Retrieves details of a specific document by its ID.\",\n    \"endpoint_template\": \"/documents/{id}\",\n    \"method\": \"GET\",\n    \"required_params\": [\"id\"],\n    \"supported_intents\": [\"get\", \"open\", \"view\", \"details\"]\n  },\n  {\n    \"action_name\": \"CREATE_DOCUMENT\",\n    \"description\": \"Uploads a new document or creates its metadata entry.\",\n    \"endpoint\": \"/documents/upload\",\n    \"method\": \"POST\",\n    \"required_params\": [\"file_data_or_metadata\"],\n    \"supported_intents\": [\"upload\", \"add\", \"create_document\"]\n  },\n  {\n    \"action_name\": \"UPDATE_DOCUMENT_BY_ID\",\n    \"description\": \"Updates an existing document by ID.\",\n    \"endpoint_template\": \"/documents/{id}/update\",\n    \"method\": \"PUT\",\n    \"required_params\": [\"id\", \"new_data\"],\n    \"supported_intents\": [\"update\", \"modify\", \"change\"]\n  },\n  {\n    \"action_name\": \"DELETE_DOCUMENT_BY_ID\",\n    \"description\": \"Deletes a document by ID.\",\n    \"endpoint_template\": \"/documents/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"required_params\": [\"id\"],\n    \"supported_intents\": [\"delete\", \"remove\", \"destroy\"]\n  },\n  {\n    \"action_name\": \"LIST_LABELS\",\n    \"description\": \"Retrieves a list of all labels (tags).\",\n    \"endpoint\": \"/labels\",\n    \"method\": \"GET\",\n    \"required_params\": [\"query_optional\"],\n    \"supported_intents\": [\"list_labels\", \"list_tags\", \"count_labels\"]\n  },\n  {\n    \"action_name\": \"GET_LABEL_DETAILS_BY_ID\",\n    \"description\": \"Retrieves details of a specific label by ID.\",\n    \"endpoint_template\": \"/labels/{id}\",\n    \"method\": \"GET\",\n    \"required_params\": [\"id\"],\n    \"supported_intents\": [\"get_label\", \"label_details\"]\n  },\n  {\n    \"action_name\": \"CREATE_LABEL\",\n    \"description\": \"Creates a new label.\",\n    \"endpoint\": \"/labels/create\",\n    \"method\": \"POST\",\n    \"required_params\": [\"name\"],\n    \"supported_intents\": [\"create_label\", \"new_tag\"]\n  },\n  {\n    \"action_name\": \"UPDATE_LABEL_BY_ID\",\n    \"description\": \"Updates an existing label by ID.\",\n    \"endpoint_template\": \"/labels/{id}/update\",\n    \"method\": \"PUT\",\n    \"required_params\": [\"id\", \"new_data\"],\n    \"supported_intents\": [\"update_label\", \"modify_tag\"]\n  },\n  {\n    \"action_name\": \"DELETE_LABEL_BY_ID\",\n    \"description\": \"Deletes a label by ID.\",\n    \"endpoint_template\": \"/labels/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"required_params\": [\"id\"],\n    \"supported_intents\": [\"delete_label\", \"remove_tag\"]\n  }\n]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        224
+      ],
+      "id": "22367f53-72e7-4464-914c-d9fcf76046dd",
+      "name": "Paperless-ngx API Endpoints"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Smart Scanner: Finds the specific JSON block containing 'api_path'\n// This ignores the first JSON block if it's just a repetition of the input.\n\nconst inputItem = items[0].json;\nconst rawText = inputItem.output || inputItem.text || inputItem.response || JSON.stringify(inputItem);\n\n// Find ALL potential JSON objects (non-greedy match)\nconst potentialJsonBlocks = rawText.match(/\\{[\\s\\S]*?\\}/g) || [];\n\nlet validPayload = null;\n\nfor (const block of potentialJsonBlocks) {\n  try {\n    const parsed = JSON.parse(block);\n    // CRITICAL CHECK: Does this block have the keys we actually need?\n    if (parsed.api_path && parsed.method) {\n      validPayload = parsed;\n      break; // Found it!\n    }\n  } catch (e) {\n    continue; // Skip invalid JSON or plain text wrapped in braces\n  }\n}\n\nif (!validPayload) {\n  throw new Error(\"CRITICAL: Agent 2 output text, but no JSON block contained 'api_path' and 'method'. Raw: \" + rawText);\n}\n\nreturn {\n  json: {\n    api_path: validPayload.api_path,\n    method: validPayload.method\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        0
+      ],
+      "id": "8d86ec23-b1bc-4dc7-9907-9f5993a765f8",
+      "name": "JSON Cleaner"
+    },
+    {
+      "parameters": {
+        "model": "codestral-latest",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "aa3b258a-6f92-441d-969e-b411fef745d2",
+      "name": "Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "DbLVe3WCJmHvdYVd",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableName": "pcnm_intent_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "3e18c386-f407-45b5-973a-11a29e30bc89",
+      "name": "Memory",
+      "credentials": {
+        "postgres": {
+          "id": "DaV1UmeDps6ndJZh",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableName": "pcnm_api_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        224
+      ],
+      "id": "a4ad7db7-8219-4d83-a505-7586969e05c8",
+      "name": "Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "DaV1UmeDps6ndJZh",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableName": "pcnm_summarizer_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1616,
+        224
+      ],
+      "id": "079b2f14-c2ff-490e-9d39-001b7c3bb2cd",
+      "name": "Memory2",
+      "credentials": {
+        "postgres": {
+          "id": "DaV1UmeDps6ndJZh",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat": {
+      "main": [
+        [
+          {
+            "node": "Intent & Language Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Small": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Intent & Language Detector": {
+      "main": [
+        [
+          {
+            "node": "API Path & Parameter Planner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Main": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "API Path & Parameter Planner": {
+      "main": [
+        [
+          {
+            "node": "JSON Cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Executor": {
+      "main": [
+        [
+          {
+            "node": "Summarizer & Translator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Summarizer": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Think Intent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Intent & Language Detector",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think API": {
+      "ai_tool": [
+        [
+          {
+            "node": "API Path & Parameter Planner",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think Summarizer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Summarizer & Translator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paperless-ngx API Endpoints": {
+      "ai_tool": [
+        [
+          {
+            "node": "API Path & Parameter Planner",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarizer & Translator": {
+      "main": [
+        []
+      ]
+    },
+    "JSON Cleaner": {
+      "main": [
+        [
+          {
+            "node": "API Executor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Intent & Language Detector",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "API Path & Parameter Planner",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Summarizer & Translator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Intent & Language Detector",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "API Path & Parameter Planner",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Summarizer & Translator",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "cd1792a1-78f5-4ecb-b711-12024cd92cb8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1665819cd0668d95cc755c197abea1095c87215c3ef66444be9e0ad7655366c4"
+  },
+  "id": "Z8pfpc9CyERNiRhp",
+  "tags": []
+}
