@@ -9,7 +9,7 @@ x-ollama-base: &ollama-base
   pull_policy: always
   entrypoint: [ "/bin/sh", "-c" ]
   command: >
-    "ollama serve & sleep 5 && ollama pull mistral:instruct && ollama pull llama3.2:3b && ollama pull qwen3:4b && wait"
+    "ollama serve & sleep 5 && ollama pull qwen3-embedding && ollama pull qwen3:8b && wait"
   volumes:
     - ~/.ollama:/root/.ollama
   healthcheck:
@@ -146,7 +146,7 @@ services:
       - 6333
       - 6334
     volumes:
-      - qdrantdata:/qdrant/storage
+      - ./.docker/qdrant/storage:/qdrant/storage
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:6333/healthz || exit 1"]
       interval: 30s
