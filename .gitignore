@@ -11,3 +11,5 @@
 !.docker/webserver/volumes/media/.gitkeep
 .docker/qdrant/storage
 !.docker/qdrant/volumes/storage/.gitkeep
+final_linkedin_story.md
+.ai
