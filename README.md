@@ -9,6 +9,7 @@ A comprehensive document digitization stack combining **Scanservjs** for scannin
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Docker and Docker Compose
 - Optional: Scanner hardware, NVIDIA GPU
 
@@ -29,6 +30,7 @@ docker compose up -d
 ```
 
 ### Access Services
+
 - **📄 Paperless-ngx**: http://localhost:8010 (admin/admin123)
 - **⚙️ n8n Workflows**: http://localhost:5678
 - **📷 Scanner**: http://localhost:8080
@@ -91,7 +93,7 @@ PAPERLESS_ADMIN_USER=admin
 PAPERLESS_ADMIN_PASSWORD=admin123
 ```
 
-See [Setup Guide](docs/setup.md) for complete configuration options.
+See [Setup Guide](.docs/setup.md) for complete configuration options.
 
 ## 🛠️ Development
 
@@ -103,7 +105,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 docker compose exec webserver python manage.py test
 ```
 
-See [Deployment Guide](docs/deployment.md) for contribution guidelines and development workflow.
+See [Deployment Guide](.docs/deployment.md) for contribution guidelines and development workflow.
 
 ## 🏷️ Tags & Categories
 
@@ -121,13 +123,6 @@ docker compose logs -f webserver    # Application logs
 curl http://localhost:8010/api/health/  # Health check
 ```
 
-## 🆘 Support
-
-- 📖 **Documentation**: Check the `docs/` directory
-- 🐛 **Issues**: [GitHub Issues](https://github.com/aliuosio/papercuts-nomore/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/aliuosio/papercuts-nomore/discussions)
-- 🤝 **Community**: [n8n Community](https://community.n8n.io) | [Paperless-ngx Forums](https://forum.paperless-ngx.com)
-
 ## 📋 Version Information
 
 - **Paperless-ngx**: v2.11.4
@@ -142,6 +137,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 Built on amazing open-source technologies:
+
 - [Paperless-ngx](https://docs.paperless-ngx.com/) - Document management
 - [n8n](https://n8n.io/) - Workflow automation
 - [Ollama](https://ollama.ai/) - Local AI models
