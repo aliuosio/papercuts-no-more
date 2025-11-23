@@ -1,5 +1,0 @@
-Agent Role,Primary Function,Input,Output,LLM Dependency
-1. Intent & Language Detector,"Determine user intent (e.g., list, search, get) and the user's language.",User Prompt,Structured JSON object.,"Ollama (or a small, fast model)"
-2. API Path & Parameter Planner,Select the exact Paperless-ngx REST endpoint and necessary query parameters.,Structured JSON from Agent 1 + Tool Node Description,Final API Path and parameters (JSON).,Ollama
-3. API Executor (n8n Tool),Execute the httprequest using the planned path/params and handle the result.,API Path and Parameters (JSON),Raw API JSON Response (or Error).,N/A (Pure n8n node)
-4. Summarizer & Translator,"Generate the final, concise, and friendly answer in the user's detected language.",Raw API JSON Response + User Language,Final Natural Language Answer.,Ollama (with a focus on summarization)
