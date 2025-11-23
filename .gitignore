@@ -9,3 +9,5 @@
 !.docker/webserver/volumes/export/.gitkeep
 .docker/webserver/volumes/media/*
 !.docker/webserver/volumes/media/.gitkeep
+.docker/qdrant/storage
+!.docker/qdrant/volumes/storage/.gitkeep
