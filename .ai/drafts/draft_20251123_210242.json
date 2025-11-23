@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "draft_id": "draft_20251123_210242",
+    "version": 1,
+    "timestamp": "2025-11-23T21:02:42Z"
+  },
+  "insights": [
+    {
+      "type": "feature",
+      "summary": "AI-powered chat assistant for document queries",
+      "evidence": [
+        {
+          "path": "n8n_shared/papeercuts-no-more.json",
+          "snippet": "You are **PaperlessAI**, an intelligent assistant for **Paperless-ngx** document management system."
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "summary": "Mandatory API tool enforcement in AI workflow",
+      "evidence": [
+        {
+          "path": "n8n_shared/papeercuts-no-more.json",
+          "snippet": "MANDATORY WORKFLOW - YOU MUST FOLLOW THESE STEPS"
+        }
+      ]
+    },
+    {
+      "type": "pattern",
+      "summary": "Service-oriented architecture with Docker Compose",
+      "evidence": [
+        {
+          "path": "docker-compose.yml",
+          "snippet": "services: ollama, n8n, webserver, scanner, db, broker"
+        }
+      ]
+    },
+    {
+      "type": "pattern",
+      "summary": "MCP server implementations for automation",
+      "evidence": [
+        {
+          "path": "mcp-servers/",
+          "snippet": "everything, fetch, filesystem, git, memory, sequentialthinking, time"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "summary": "German language OCR and timezone support",
+      "evidence": [
+        {
+          "path": ".env",
+          "snippet": "PAPERLESS_OCR_LANGUAGE=deu\nPAPERLESS_TIME_ZONE=Europe/Berlin"
+        }
+      ]
+    },
+    {
+      "type": "problem",
+      "summary": "Evolution to simplified single-agent approach",
+      "evidence": [
+        {
+          "path": "n8n_shared/papercuts-no-more-multi-agents.json",
+          "snippet": "Removed in recent commit - multi-agent file deleted"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "summary": "GPU-enabled AI model serving",
+      "evidence": [
+        {
+          "path": "docker-compose.yml",
+          "snippet": "ollama-nvidia with GPU deployment configuration"
+        }
+      ]
+    }
+  ],
+  "story_structure": [
+    {
+      "section": "overview",
+      "markdown_content": "# Papercuts No More: End-to-End Document Intelligence\n\nA Docker-based document digitization stack that transforms paper-based workflows into AI-powered document management, eliminating friction points from manual document handling through intelligent automation.",
+      "anchors": ["README.md", "docker-compose.yml"]
+    },
+    {
+      "section": "origins",
+      "markdown_content": "## From Paper Chaos to Digital Intelligence\n\nBorn from the frustration of managing physical documents, this project integrates scanning hardware, OCR processing, database storage, and AI analysis into a seamless pipeline. The n8n workflow automation bridges technical systems with natural language interfaces.",
+      "anchors": ["README.md", "git history - startup commits"]
+    },
+    {
+      "section": "features",
+      "markdown_content": "## Core Capabilities\n\n- **Automated Ingestion**: Scanservjs captures documents and feeds them directly to Paperless-ngx for OCR processing\n- **Intelligent Storage**: PostgreSQL-backed document management with metadata tagging and full-text search\n- **AI-Powered Queries**: Ollama-powered chat assistant understands natural language queries about document collections\n- **Workflow Automation**: n8n orchestrates document processing pipelines with mandatory API tool usage for reliable AI behavior",
+      "anchors": ["docker-compose.yml", "n8n_shared/papeercuts-no-more.json", ".env"]
+    },
+    {
+      "section": "tech",
+      "markdown_content": "## Technology Architecture\n\nDocker Compose orchestrates six services: Scanservjs (scanning), Paperless-ngx (management), n8n (automation), Ollama (AI), PostgreSQL (data), and Redis (caching). MCP server implementations extend automation capabilities with specialized tools for filesystem, git, memory management, and sequential reasoning.",
+      "anchors": ["docker-compose.yml", "mcp-servers/", ".env"]
+    },
+    {
+      "section": "impact",
+      "markdown_content": "## Democratizing Document Management\n\nTransforms document handling from manual, time-consuming processes to instant, conversational access. Users query their document database naturally ('What documents were added about insurance?') without technical knowledge. Supports German language documents and maintains data privacy with local AI processing.",
+      "anchors": ["n8n_shared/papeercuts-no-more.json", ".env"]
+    },
+    {
+      "section": "roadmap",
+      "markdown_content": "## Evolution & Growth\n\nRecent developments focus on robust AI tool enforcement and workflow simplification. Future enhancements may include advanced document classification, automated categorization, and integration with additional MCP servers for specialized document processing tasks.",
+      "anchors": ["git log - recent commits", "mcp-servers/"]
+    }
+  ],
+  "social_content": {
+    "linkedin": [
+      {
+        "variant": "short",
+        "text": "🎯 Tired of drowning in paper documents? Built an end-to-end digitization stack: scan → OCR → AI search in one seamless pipeline. Ask your documents questions naturally! 💡 #AI #DocumentManagement #DevOps\n\nScreenshot: Workflow architecture showing integrated services",
+        "cta": "Check it out → [GitHub Link]"
+      },
+      {
+        "variant": "mid",
+        "text": "From paper chaos to AI-powered document intelligence! 🚀\n\nCreated a Docker stack that:\n• Scans documents automatically\n• Processes with OCR (German support)\n• Stores in organized database\n• Answers queries via AI chat\n\nThe breakthrough? n8n workflow enforces mandatory API tool usage, ensuring AI assistants actually use tools instead of hallucinating responses.\n\nTechnical highlights:\n- Ollama for local AI privacy\n- GCP-ready deployment\n- MCP servers for extensibility\n\nWho else is building AI that actually works? 🤔\n\nScreenshot: AI conversation showing natural document queries\n\n#AI #Automation #Docker #OpenSource",
+        "cta": "See the code → [GitHub Link]"
+      },
+      {
+        "variant": "long",
+        "text": "Eliminating the 'papercuts' of document management with AI. 📄➡️🧠\n\nIn a world of overwhelming paperwork, I built a complete digitization pipeline that becomes your intelligent document assistant.\n\n**The Problem**: Finding information buried in paper documents is painfully slow. Existing solutions are either too complex or don't understand natural language.\n\n**The Solution**: End-to-end automation with AI you can actually talk to.\n\n**Architecture**:\n🔹 Scanservjs captures documents\n🔹 Paperless-ngx processes OCR and organizes\n🔹 n8n automates workflows\n🔹 Ollama provides local AI analysis\n\n**The Innovation**: Most AI assistants hallucinate without proper tool constraints. This system mandates API tool usage - the AI is forced to use actual tools before responding.\n\n**Impact**: Ask \"What insurance documents from October?\" and get instant, accurate results. No more filing cabinets or endless searches.\n\n**Tech Stack**: Docker Compose, PostgreSQL, Redis, MCP servers, German OCR support, NVIDIA GPU optimization.\n\nBuilding for the future of document intelligence. What's your biggest document management pain point?\n\nScreenshot 1: System architecture diagram\nScreenshot 2: Chat interface demo\nScreenshot 3: Multi-service deployment\n\n#ArtificialIntelligence #Automation #DocumentManagement #DevTools #AI",
+        "cta": "Fork & contribute → [GitHub Link]"
+      }
+    ]
+  }
+}
