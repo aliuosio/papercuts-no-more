@@ -9,7 +9,7 @@
       "typeVersion": 1.3,
       "position": [
         0,
-        176
+        -32
       ],
       "id": "6a7538a5-f63d-43d8-8a44-4de5bb6f909e",
       "name": "Chat",
@@ -88,8 +88,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
       "position": [
-        432,
-        368
+        0,
+        296
       ],
       "id": "0790b578-66f7-4bda-9d9d-ca70b7355c25",
       "name": "Ollama",
@@ -119,37 +119,10 @@
       "typeVersion": 3.4,
       "position": [
         224,
-        176
+        -32
       ],
       "id": "a8fcdcf8-907d-4fb1-ac3b-bc9a11f951ff",
       "name": "SetVars"
-    },
-    {
-      "parameters": {
-        "mode": "retrieve-as-tool",
-        "toolDescription": "Use this tool to find the correct API endpoints, HTTP methods (GET/POST/DELETE), and parameter requirements for Paperless-ngx. Always search this tool before constructing an API call to ensure the path and body are correct (e.g., for uploading documents or creating labels).",
-        "qdrantCollection": {
-          "__rl": true,
-          "value": "papercuts-no-more",
-          "mode": "list",
-          "cachedResultName": "papercuts-no-more"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
-      "typeVersion": 1.3,
-      "position": [
-        832,
-        192
-      ],
-      "id": "2b4e8616-4748-49cd-8845-c6ccd3df0b69",
-      "name": "search_paperless_api",
-      "credentials": {
-        "qdrantApi": {
-          "id": "oVTIiAbR6buS2qGA",
-          "name": "QdrantApi account"
-        }
-      }
     },
     {
       "parameters": {
@@ -175,112 +148,16 @@
     },
     {
       "parameters": {
-        "model": "qwen3-embedding:8b"
+        "jsCode": "[\n  {\n    \"endpoint\": \"/documents\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'}).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific document by ID. The ID must be in the endpoint path.\"\n  },\n  {\n    \"endpoint\": \"/documents/upload\",\n    \"method\": \"POST\",\n    \"description\": \"Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing document by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a document by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of labels (also known as tags in Paperless-ngx).\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific label by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels/create\",\n    \"method\": \"POST\",\n    \"description\": \"Creates a new label. Use 'body' for {'name': 'new_label_name'}.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing label by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a label by ID.\"\n  }\n]"
       },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
-      "typeVersion": 1,
-      "position": [
-        912,
-        400
-      ],
-      "id": "e73d2871-2bbd-45a5-99e2-84eecd8ce36b",
-      "name": "Embeddings Ollama",
-      "credentials": {
-        "ollamaApi": {
-          "id": "zA9qEwAA2G4sAb1v",
-          "name": "Ollama account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "formTitle": "Upload Documents to Qdrant",
-        "formDescription": "Upload one or more documents to be processed and stored in the Qdrant vector database. Supported formats include PDF, DOCX, TXT, and other common document types.",
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "Files to Import",
-              "fieldType": "file",
-              "acceptFileTypes": ".pdf,.docx,.txt,.md,.html,.rtf,.xlsx,.csv,.json",
-              "requiredField": true
-            },
-            {
-              "fieldLabel": "Document Description (Optional)",
-              "fieldType": "textarea",
-              "placeholder": "Add metadata or description for these documents"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 2.3,
-      "position": [
-        1120,
-        -32
-      ],
-      "id": "e28171de-556e-4453-9847-35137b3803c9",
-      "name": "Upload Form",
-      "webhookId": "3e49e9d1-2b81-4d53-b0c3-09af4efd440b"
-    },
-    {
-      "parameters": {
-        "mode": "insert",
-        "qdrantCollection": {
-          "__rl": true,
-          "value": "papercuts-no-more",
-          "mode": "list",
-          "cachedResultName": "papercuts-no-more"
-        },
-        "embeddingBatchSize": 50,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        1344,
-        -32
-      ],
-      "id": "4aa078e4-53ec-446b-bced-400fc7823a6a",
-      "name": "Qdrant Vector Store",
-      "credentials": {
-        "qdrantApi": {
-          "id": "oVTIiAbR6buS2qGA",
-          "name": "QdrantApi account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
-      "typeVersion": 1.1,
-      "position": [
-        1488,
+        832,
         192
       ],
-      "id": "66c5c47b-7c38-4caf-b0d4-61a5a7aaa619",
-      "name": "Default Data Loader"
-    },
-    {
-      "parameters": {
-        "model": "qwen3-embedding:8b"
-      },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
-      "typeVersion": 1,
-      "position": [
-        1360,
-        192
-      ],
-      "id": "95929816-26ca-4296-b469-2f84feaa2301",
-      "name": "Embeddings Ollama1",
-      "credentials": {
-        "ollamaApi": {
-          "id": "zA9qEwAA2G4sAb1v",
-          "name": "Ollama account"
-        }
-      }
+      "id": "8f2250e4-98ba-4b56-87bf-3a12cc5ed4b3",
+      "name": "Code Tool"
     }
   ],
   "pinData": {},
@@ -339,17 +216,6 @@
         []
       ]
     },
-    "search_paperless_api": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Mistral": {
       "ai_languageModel": [
         [
@@ -361,45 +227,12 @@
         ]
       ]
     },
-    "Embeddings Ollama": {
-      "ai_embedding": [
+    "Code Tool": {
+      "ai_tool": [
         [
           {
-            "node": "search_paperless_api",
-            "type": "ai_embedding",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Upload Form": {
-      "main": [
-        [
-          {
-            "node": "Qdrant Vector Store",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Default Data Loader": {
-      "ai_document": [
-        [
-          {
-            "node": "Qdrant Vector Store",
-            "type": "ai_document",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Embeddings Ollama1": {
-      "ai_embedding": [
-        [
-          {
-            "node": "Qdrant Vector Store",
-            "type": "ai_embedding",
+            "node": "AI Agent",
+            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -410,10 +243,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d5707cea-6cf7-4c14-9e9a-0872684d4551",
+  "versionId": "fd0ed236-c0e3-442c-85c1-84165442937c",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "1665819cd0668d95cc755c197abea1095c87215c3ef66444be9e0ad7655366c4"
+    "instanceId": "95695f58c7d69bdd1336722b35e40f2664b6ec95bb93a737782dd1fc1b6f4ea5"
   },
   "id": "QD70ayXSHBvzk26e",
   "tags": []
