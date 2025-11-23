@@ -8,10 +8,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.3,
       "position": [
-        0,
-        -32
+        704,
+        -16
       ],
-      "id": "6a7538a5-f63d-43d8-8a44-4de5bb6f909e",
+      "id": "3cfb67f4-f81c-42c1-a647-5780592018c0",
       "name": "Chat",
       "webhookId": "5aa94780-60e1-40b5-9634-e57d6bc986e2"
     },
@@ -20,62 +20,56 @@
         "promptType": "define",
         "text": "={{ $('Chat').item.json.chatInput }}",
         "options": {
-          "systemMessage": "=## PaperlessAI n8n Assistant\n\nYou are **PaperlessAI**, an n8n assistant for **Paperless-ngx** via its **Paperless API**. Your goal is to interpret user requests, execute the correct API calls using the `httprequest` node, and reply with clear, conversational, human-like answers. **Never show your reasoning or raw API JSON output.**\n\n---\n\n### Context\n* **API Base URL (Without /api/):** `{{ $('SetVars').item.json.url }}`\n* **Full URL Construction:** The Paperless API requires the path to be prefixed with `/api/`. **The final URL MUST be constructed as: `{{ $('SetVars').item.json.url }}/api/{{path_from_search}}`**\n\n---\n\n### Tools & Process\n* **Tools:**\n    * **Endpoint Search** (`search_paperless_api`): Use this tool **first** to find the correct API `path`, `method` (GET/POST/PUT/DELETE), and required `parameters` for Paperless-ngx actions.\n    * **Paperless API** (`httprequest`): Use this tool **second** to execute the final API call, using the details retrieved from the `Endpoint Search` tool.\n    * **Think**: Use this tool for internal reasoning and planning only. Do not output the content of a Think step to the user.\n* **Process:**\n    1.  Analyze user intent.\n    2.  Call **Endpoint Search** (`search_paperless_api`) with a query to determine the required API details.\n    3.  Based on the search result, call the **Paperless API** (`httprequest`). If necessary information (like an ID or title) is missing, use **Think** and naturally ask the user for it.\n    4.  Present a short, natural reply based on the retrieved data.\n\n---\n\n### Rules\n* Output only the final conversational answer.\n* Do not invent data, endpoints, or IDs.\n* Be concise, friendly, and confident.\n* **File Uploads:** The `/documents/upload` endpoint only accepts **metadata** (like title, tags, date). You **CANNOT** process or send the binary file itself. If a user asks to upload a file, confirm the metadata (title, tags, etc.) first and then state that the file transfer will be handled by a separate node in n8n."
+          "systemMessage": "=## PaperlessAI n8n Assistant\n\nYou are **PaperlessAI**, an intelligent assistant for **Paperless-ngx** document management system.\n\n---\n\n### API Configuration\n* **Base URL:** `{{ $('SetVars').item.json.url }}`\n* **API Token:** Authentication is handled automatically via X-API-Key header\n* **Critical URL Format:** `{{ $('SetVars').item.json.url }}/api/{endpoint_path}/`\n* **IMPORTANT:** All endpoints MUST end with a trailing slash `/`\n\n---\n\n### How to Handle Requests\n\n**STEP 1: Find the Endpoint**\nCall **Paperless API Reference** with a simple search query:\n- \"list documents\" → finds /api/documents/\n- \"get tags\" → finds /api/tags/\n- \"create tag\" → finds /api/tags/\n\n**STEP 2: Build the Complete URL**\nCombine base URL + /api/ + endpoint + trailing slash:\n- Example: `http://webserver:8000/api/documents/`\n- Example: `http://webserver:8000/api/tags/`\n- Example: `http://webserver:8000/api/documents/123/`\n\n**STEP 3: Execute the API Call**\nCall **Paperless API** with:\n- Full URL (with trailing slash!)\n- HTTP method (GET, POST, PUT, DELETE)\n- JSON body if needed (POST/PUT only)\n\n**STEP 4: Handle Response**\n- If response is HTML or login page → Authentication failed\n- If response is JSON → Success! Parse and respond naturally\n- If empty array [] → No items found, tell user clearly\n\n---\n\n### Example Workflows\n\n**User: \"Show me all my documents\"**\n1. Search: \"list documents\"\n2. Build URL: `{{ $('SetVars').item.json.url }}/api/documents/`\n3. Call API with GET method\n4. Response: If [], say \"You don't have any documents yet.\" If data, summarize it.\n\n**User: \"Create a tag called invoices\"**\n1. Search: \"create tag\"\n2. Build URL: `{{ $('SetVars').item.json.url }}/api/tags/`\n3. Call API with POST method and body: {\"name\": \"invoices\"}\n4. Response: Confirm creation\n\n---\n\n### Critical Rules\n\n1. **Always add trailing slash** to all API URLs\n2. **Always use the tools** - Never say you can't help\n3. **Check for HTML in response** - If you get HTML, the API call failed\n4. **Empty arrays are valid** - Tell users when there's no data\n5. **Use /api/tags/ not /api/labels/** - Paperless-ngx uses 'tags' in the actual API\n\n---\n\n### Common Paperless-ngx Endpoints\n- `/api/documents/` - List/create documents\n- `/api/documents/{id}/` - Get/update/delete specific document\n- `/api/tags/` - List/create tags\n- `/api/tags/{id}/` - Get/update/delete specific tag\n- `/api/correspondents/` - Manage correspondents\n- `/api/document_types/` - Manage document types\n\n---\n\n### Available Tools\n\n**Paperless API Reference** - Search for endpoints\n**Paperless API** - Execute HTTP calls\n**Think** - Internal reasoning only\n\nRemember: Be helpful, use your tools, and always include trailing slashes in URLs!"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        568,
-        -32
+        1280,
+        -16
       ],
-      "id": "11259e37-324b-46a8-87d1-eff52332bcfe",
+      "id": "2e1dfe97-bc5f-49ad-a632-1a916e510548",
       "name": "AI Agent"
     },
     {
       "parameters": {
-        "toolDescription": "The main execution tool. Use this to perform the final API call (GET, POST, PUT, DELETE) to Paperless-ngx. The API path, method, and parameters must be sourced from the search_paperless_api tool before this tool is called.",
+        "toolDescription": "Executes HTTP requests to Paperless-ngx API. CRITICAL: All URLs must end with trailing slash /. Example: http://webserver:8000/api/documents/ not http://webserver:8000/api/documents",
+        "method": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('method', 'GET', 'string') }}",
         "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "X-API-Key",
-              "value": "X3ooteih9th&ae9th0ahoh4ieH#"
-            }
-          ]
-        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
         "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Name', ``, 'string') }}",
-              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
-            }
-          ]
-        },
+        "specifyBody": "json",
+        "jsonBody": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('JSON', ``, 'json') }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.3,
       "position": [
-        576,
-        192
+        1280,
+        208
       ],
-      "id": "5b3d10b8-6fd1-4acd-bf2d-fdf8143ab866",
-      "name": "Paperless API"
+      "id": "c81faf24-d5d9-4212-89c8-afbb3b6da72e",
+      "name": "Paperless API",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "yN4O1LogTe1RNnTA",
+          "name": "Unnamed credential"
+        }
+      }
     },
     {
       "parameters": {
-        "description": "Use this tool for internal reasoning and planning only. Do not output the content of a Think step to the user. Use it to check for missing information (like a document ID) or to formulate the plan before executing search_paperless_api or Paperless API."
+        "description": "Internal reasoning tool. Use this to plan your approach or check for missing information before calling other tools. The output is never shown to the user."
       },
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        704,
-        192
+        1408,
+        208
       ],
-      "id": "7ec4740f-d839-4b81-9ce0-61c7a697dcf6",
+      "id": "328ea1db-afb6-4503-b72f-e778c85576b6",
       "name": "Think"
     },
     {
@@ -88,17 +82,11 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
       "position": [
-        0,
-        296
+        704,
+        320
       ],
-      "id": "0790b578-66f7-4bda-9d9d-ca70b7355c25",
+      "id": "a0601b72-f2c0-4da6-9c13-932e32121043",
       "name": "Ollama",
-      "credentials": {
-        "ollamaApi": {
-          "id": "zA9qEwAA2G4sAb1v",
-          "name": "Ollama account"
-        }
-      },
       "disabled": true
     },
     {
@@ -108,7 +96,13 @@
             {
               "id": "88283c79-5602-4553-a907-655533246911",
               "name": "url",
-              "value": "http://webserver:8000/",
+              "value": "http://webserver:8000",
+              "type": "string"
+            },
+            {
+              "id": "api-token-var",
+              "name": "apiToken",
+              "value": "X3ooteih9th&ae9th0ahoh4ieH#",
               "type": "string"
             }
           ]
@@ -118,46 +112,47 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        224,
-        -32
+        928,
+        -16
       ],
-      "id": "a8fcdcf8-907d-4fb1-ac3b-bc9a11f951ff",
+      "id": "cfc8f800-6230-497c-a3ef-6ecf332980e5",
       "name": "SetVars"
     },
     {
       "parameters": {
         "model": "codestral-latest",
         "options": {
-          "temperature": 0.1
+          "temperature": 0.3
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
       "typeVersion": 1,
       "position": [
-        448,
-        192
+        1152,
+        208
       ],
-      "id": "f6cc559f-1eb6-4ef9-9ed8-14f342c4aa50",
+      "id": "8535205c-bd07-418c-bbe2-c81f3ac0d2c6",
       "name": "Mistral",
       "credentials": {
         "mistralCloudApi": {
-          "id": "DbLVe3WCJmHvdYVd",
+          "id": "FeL65rwB61JwBqWK",
           "name": "Mistral Cloud account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "[\n  {\n    \"endpoint\": \"/documents\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'}).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific document by ID. The ID must be in the endpoint path.\"\n  },\n  {\n    \"endpoint\": \"/documents/upload\",\n    \"method\": \"POST\",\n    \"description\": \"Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry).\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing document by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/documents/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a document by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves a list of labels (also known as tags in Paperless-ngx).\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}\",\n    \"method\": \"GET\",\n    \"description\": \"Retrieves details of a specific label by ID.\"\n  },\n  {\n    \"endpoint\": \"/labels/create\",\n    \"method\": \"POST\",\n    \"description\": \"Creates a new label. Use 'body' for {'name': 'new_label_name'}.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/update\",\n    \"method\": \"PUT\",\n    \"description\": \"Updates an existing label by ID. Use 'body' for the new data.\"\n  },\n  {\n    \"endpoint\": \"/labels/{id}/delete\",\n    \"method\": \"DELETE\",\n    \"description\": \"Deletes a label by ID.\"\n  }\n]"
+        "description": "Search for Paperless-ngx API endpoints. Provide queries like: 'list documents', 'create tag', 'get document by id', 'delete tag'. Returns endpoint path, HTTP method, and usage instructions. IMPORTANT: All Paperless-ngx API endpoints require trailing slashes.",
+        "jsCode": "// Paperless-ngx API endpoints - ALL paths must end with /\nconst endpoints = [\n  {\n    \"endpoint\": \"/api/documents/\",\n    \"method\": \"GET\",\n    \"description\": \"List all documents. Optional params: ?query=searchterm. Returns array of documents.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/\",\n    \"method\": \"POST\",\n    \"description\": \"Create a new document. Body: {title, content, tags, correspondent, document_type}. File upload requires separate handling.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/{id}/\",\n    \"method\": \"GET\",\n    \"description\": \"Get details of document by ID. Replace {id} with actual document ID.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/{id}/\",\n    \"method\": \"PATCH\",\n    \"description\": \"Update document by ID. Body: fields to update. Replace {id} with actual document ID.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/{id}/\",\n    \"method\": \"DELETE\",\n    \"description\": \"Delete document by ID. Replace {id} with actual document ID.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/\",\n    \"method\": \"GET\",\n    \"description\": \"List all tags. Returns array of tags.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/\",\n    \"method\": \"POST\",\n    \"description\": \"Create a new tag. Body: {name, color, is_inbox_tag}.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/{id}/\",\n    \"method\": \"GET\",\n    \"description\": \"Get tag details by ID. Replace {id} with actual tag ID.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/{id}/\",\n    \"method\": \"PATCH\",\n    \"description\": \"Update tag by ID. Body: fields to update. Replace {id} with actual tag ID.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/{id}/\",\n    \"method\": \"DELETE\",\n    \"description\": \"Delete tag by ID. Replace {id} with actual tag ID.\"\n  },\n  {\n    \"endpoint\": \"/api/correspondents/\",\n    \"method\": \"GET\",\n    \"description\": \"List all correspondents.\"\n  },\n  {\n    \"endpoint\": \"/api/document_types/\",\n    \"method\": \"GET\",\n    \"description\": \"List all document types.\"\n  }\n];\n\n// Search query from AI agent\nconst searchQuery = query.toLowerCase();\n\n// Search through endpoints\nconst matches = endpoints.filter(ep => {\n  const searchText = `${ep.endpoint} ${ep.method} ${ep.description}`.toLowerCase();\n  return searchText.includes(searchQuery);\n});\n\nif (matches.length === 0) {\n  return `No matching endpoints for: \"${query}\". Available: documents (list/create/get/update/delete), tags (list/create/get/update/delete), correspondents, document_types.`;\n}\n\n// Return formatted results\nreturn matches.map(ep => \n  `Endpoint: ${ep.endpoint}\\nMethod: ${ep.method}\\nDescription: ${ep.description}\\n⚠️ IMPORTANT: URL must end with trailing slash!`\n).join('\\n\\n---\\n\\n');"
       },
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        832,
-        192
+        1536,
+        208
       ],
-      "id": "8f2250e4-98ba-4b56-87bf-3a12cc5ed4b3",
-      "name": "Code Tool"
+      "id": "419da04b-0c3b-4eeb-9a3a-6419f8d49b83",
+      "name": "Paperless API Reference"
     }
   ],
   "pinData": {},
@@ -195,11 +190,6 @@
         ]
       ]
     },
-    "Ollama": {
-      "ai_languageModel": [
-        []
-      ]
-    },
     "SetVars": {
       "main": [
         [
@@ -209,11 +199,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        []
       ]
     },
     "Mistral": {
@@ -227,7 +212,7 @@
         ]
       ]
     },
-    "Code Tool": {
+    "Paperless API Reference": {
       "ai_tool": [
         [
           {
@@ -243,11 +228,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "fd0ed236-c0e3-442c-85c1-84165442937c",
+  "versionId": "74bd1fd4-8072-4b41-afe5-8ef7a0696405",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "95695f58c7d69bdd1336722b35e40f2664b6ec95bb93a737782dd1fc1b6f4ea5"
+    "instanceId": "c1620826dafa183ba86b7ecdcb8978c00643b92ac19929818bbb0d8fcc861af3"
   },
-  "id": "QD70ayXSHBvzk26e",
+  "id": "R509dF9nVfQke3vl",
   "tags": []
 }
