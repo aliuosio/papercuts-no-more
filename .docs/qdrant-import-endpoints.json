@@ -1,0 +1,144 @@
+{
+  "points": [
+    {
+      "id": "GET--documents",
+      "vector": [],
+      "payload": {
+        "path": "/documents",
+        "method": "GET",
+        "summary": "Retrieves a list of documents.",
+        "description": "Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'}).",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "GET /documents — Retrieves a list of documents. Use 'parameters' for filtering (e.g., {'query': 'search term'})."
+      }
+    },
+    {
+      "id": "GET--documents--id",
+      "vector": [],
+      "payload": {
+        "path": "/documents/{id}",
+        "method": "GET",
+        "summary": "Retrieves details of a specific document by ID.",
+        "description": "Retrieves details of a specific document by ID. The ID must be in the endpoint path.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "GET /documents/{id} — Retrieves details of a specific document by ID. The ID must be in the endpoint path."
+      }
+    },
+    {
+      "id": "POST--documents-upload",
+      "vector": [],
+      "payload": {
+        "path": "/documents/upload",
+        "method": "POST",
+        "summary": "Uploads a new document.",
+        "description": "Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry).",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "POST /documents/upload — Uploads a new document. (Note: File data must be handled by a separate n8n step; you can only create the document metadata entry)."
+      }
+    },
+    {
+      "id": "PUT--documents--id--update",
+      "vector": [],
+      "payload": {
+        "path": "/documents/{id}/update",
+        "method": "PUT",
+        "summary": "Updates an existing document by ID.",
+        "description": "Updates an existing document by ID. Use 'body' for the new data.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "PUT /documents/{id}/update — Updates an existing document by ID. Use 'body' for the new data."
+      }
+    },
+    {
+      "id": "DELETE--documents--id--delete",
+      "vector": [],
+      "payload": {
+        "path": "/documents/{id}/delete",
+        "method": "DELETE",
+        "summary": "Deletes a document by ID.",
+        "description": "Deletes a document by ID.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "DELETE /documents/{id}/delete — Deletes a document by ID."
+      }
+    },
+    {
+      "id": "GET--labels",
+      "vector": [],
+      "payload": {
+        "path": "/labels",
+        "method": "GET",
+        "summary": "Retrieves a list of labels.",
+        "description": "Retrieves a list of labels (also known as tags in Paperless-ngx).",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "GET /labels — Retrieves a list of labels (also known as tags in Paperless-ngx)."
+      }
+    },
+    {
+      "id": "GET--labels--id",
+      "vector": [],
+      "payload": {
+        "path": "/labels/{id}",
+        "method": "GET",
+        "summary": "Retrieves details of a specific label by ID.",
+        "description": "Retrieves details of a specific label by ID.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "GET /labels/{id} — Retrieves details of a specific label by ID."
+      }
+    },
+    {
+      "id": "POST--labels-create",
+      "vector": [],
+      "payload": {
+        "path": "/labels/create",
+        "method": "POST",
+        "summary": "Creates a new label.",
+        "description": "Creates a new label. Use 'body' for {'name': 'new_label_name'}.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "POST /labels/create — Creates a new label. Use 'body' for {'name': 'new_label_name'}."
+      }
+    },
+    {
+      "id": "PUT--labels--id--update",
+      "vector": [],
+      "payload": {
+        "path": "/labels/{id}/update",
+        "method": "PUT",
+        "summary": "Updates an existing label by ID.",
+        "description": "Updates an existing label by ID. Use 'body' for the new data.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "PUT /labels/{id}/update — Updates an existing label by ID. Use 'body' for the new data."
+      }
+    },
+    {
+      "id": "DELETE--labels--id--delete",
+      "vector": [],
+      "payload": {
+        "path": "/labels/{id}/delete",
+        "method": "DELETE",
+        "summary": "Deletes a label by ID.",
+        "description": "Deletes a label by ID.",
+        "service": "papercuts-api",
+        "created_at": "2025-11-23T12:00:00Z",
+        "is_deprecated": false,
+        "embed_text": "DELETE /labels/{id}/delete — Deletes a label by ID."
+      }
+    }
+  ]
+}
