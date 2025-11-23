@@ -1,8 +1,0 @@
-
-set Ollama URL
-http://ollama-nvidia:11434
-
-configure Paperles API
-credentials
-User: admin
-Password: X3ooteih9th&ae9th0ahoh4ieH#
