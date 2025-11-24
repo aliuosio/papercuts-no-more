@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green)](./LICENSE)
 
 A comprehensive document digitization stack combining **Scanservjs** for scanning, **Paperless-ngx** for OCR processing, **n8n** for workflow automation, and **Ollama** for AI-powered analysis.
+An n8n workflow with an ai agent to discuss with your documents is installed on first run of the setup.
+works completely offline using ollama with Qwen3 as AI.
 
 ## 🚀 Quick Start
 
@@ -15,8 +17,8 @@ A comprehensive document digitization stack combining **Scanservjs** for scannin
 
 ### Installation
 ```bash
-git clone https://github.com/aliuosio/papercuts-nomore.git
-cd papercuts-nomore
+git clone https://github.com/aliuosio/papercuts-no-more
+cd papercuts-no-more
 ```
 
 ### Launch (GPU recommended)
