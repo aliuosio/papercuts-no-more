@@ -10,7 +10,8 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./n8n_shared:/home/node/.n8n/workflows
+      - ./n8n_storage:/home/node/n8n_storage
+      - ~/Dokumente/Documentations:/home/node/.n8n-files/
     depends_on:
       webserver:
         condition: service_healthy
