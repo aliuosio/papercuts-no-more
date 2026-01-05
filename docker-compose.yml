@@ -1,52 +1,4 @@
-x-ollama-base: &ollama-base
-  image: "alpine/ollama:${OLLAMA_VERSION:-latest}"
-  container_name: "${NAMESPACE}_ollama"
-  ports:
-    - "11434:11434"
-  env_file: .env
-  tty: true
-  init: true
-  pull_policy: always
-  entrypoint: [ "/bin/sh", "-c" ]
-  command: >
-    "ollama serve & sleep 5 && ollama pull qwen3:8b && wait"
-  volumes:
-    - ~/.ollama:/root/.ollama
-  healthcheck:
-    test: ["CMD-SHELL", "nc -w 2 -z localhost 11434"]
-    start_period: 1m
-    interval: 30s
-    timeout: 5s
-    retries: 3
-
-x-ollama-gpu-deploy: &ollama-gpu-deploy
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - count: 1
-            capabilities:
-              - gpu
-
 services:
-  
-  ollama:
-    <<: *ollama-base
-    profiles:
-      - cpu
-
-  ollama-nvidia:
-    <<: [*ollama-base, *ollama-gpu-deploy]
-    profiles:
-      - nvidia
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: ${OLLAMA_GPU_DRIVER:-nvidia}
-              count: 1
-              capabilities:
-                - gpu
 
   n8n:
     container_name: ${NAMESPACE}_n8n
@@ -130,8 +82,6 @@ services:
       - ./.docker/webserver/volumes/consume:/var/lib/scanservjs/output
     privileged: true
     network_mode: "host"
-    devices:
-      - "/dev/bus/usb:/dev/bus/usb"
     ports:
       - 8080:8080
 
