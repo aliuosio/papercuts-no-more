@@ -18,7 +18,7 @@ services:
     ports:
       - 5678:5678
     entrypoint: ["/bin/sh", "-c"]
-    command: ["n8n import:workflow --input=/home/node/.n8n/workflows/papeercuts-no-more.json; n8n"]
+    command: ["n8n import:workflow --input=/home/node/.n8n/workflows/Papeercuts-No-More.json; n8n"]
 
   broker:
     container_name: ${NAMESPACE}_broker
