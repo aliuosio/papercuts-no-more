@@ -1,5 +1,5 @@
 {
-  "name": "papeercuts-no-more",
+  "name": "Papercuts No More",
   "nodes": [
     {
       "parameters": {
@@ -8,10 +8,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.3,
       "position": [
-        704,
-        -16
+        608,
+        -64
       ],
-      "id": "3cfb67f4-f81c-42c1-a647-5780592018c0",
+      "id": "b774bd45-4d20-42a9-8795-8945b7aa2903",
       "name": "Chat",
       "webhookId": "5aa94780-60e1-40b5-9634-e57d6bc986e2"
     },
@@ -26,38 +26,11 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        1280,
-        -16
+        1184,
+        -64
       ],
-      "id": "2e1dfe97-bc5f-49ad-a632-1a916e510548",
+      "id": "6f423186-6db9-47c4-abb1-68b4678b9d55",
       "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "toolDescription": "Executes HTTP requests to Paperless-ngx API. CRITICAL: All URLs must end with trailing slash /. Example: http://webserver:8000/api/documents/ not http://webserver:8000/api/documents",
-        "method": "={{ $fromAI('method', '', 'string') }}",
-        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('JSON', ``, 'json') }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 4.3,
-      "position": [
-        1280,
-        208
-      ],
-      "id": "c81faf24-d5d9-4212-89c8-afbb3b6da72e",
-      "name": "Paperless API",
-      "credentials": {
-        "httpBasicAuth": {
-          "id": "k9wyhGJRB1CGjbjb",
-          "name": "Unnamed credential"
-        }
-      }
     },
     {
       "parameters": {
@@ -66,33 +39,11 @@
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        1408,
-        208
+        1312,
+        160
       ],
-      "id": "328ea1db-afb6-4503-b72f-e778c85576b6",
+      "id": "db41e34f-91ba-4332-8802-4d52a407f053",
       "name": "Think"
-    },
-    {
-      "parameters": {
-        "model": "qwen3:8b",
-        "options": {
-          "temperature": 0.2
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "typeVersion": 1,
-      "position": [
-        1152,
-        208
-      ],
-      "id": "a0601b72-f2c0-4da6-9c13-932e32121043",
-      "name": "Ollama",
-      "credentials": {
-        "ollamaApi": {
-          "id": "Dv8E9bvDRMFl0QFI",
-          "name": "Ollama account"
-        }
-      }
     },
     {
       "parameters": {
@@ -109,6 +60,12 @@
               "name": "apiToken",
               "value": "X3ooteih9th&ae9th0ahoh4ieH#",
               "type": "string"
+            },
+            {
+              "id": "ffd1acc3-fe09-477a-951b-6421b39878ac",
+              "name": "uid",
+              "value": "={{ Math.floor(Math.random() * 1000000000) }}",
+              "type": "string"
             }
           ]
         },
@@ -117,25 +74,101 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        928,
-        -16
+        832,
+        -64
       ],
-      "id": "cfc8f800-6230-497c-a3ef-6ecf332980e5",
+      "id": "ba2f7acf-f380-4bbb-bd1b-b03df3397c18",
       "name": "SetVars"
     },
     {
       "parameters": {
-        "description": "Search for Paperless-ngx API endpoints. Provide queries like: 'list documents', 'create tag', 'get document by id', 'delete tag'. Returns endpoint path, HTTP method, and usage instructions. IMPORTANT: All Paperless-ngx API endpoints require trailing slashes.",
-        "jsCode": "// Paperless-ngx API endpoints - ALL paths must end with /\nconst endpoints = [\n  {\n    \"endpoint\": \"/api/documents/\",\n    \"method\": \"GET\",\n    \"description\": \"List all documents. Optional params: ?query=searchterm. Returns array of documents.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/\",\n    \"method\": \"POST\",\n    \"description\": \"Create a new document. Body: {title, content, tags, correspondent, document_type}. File upload requires separate handling.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/{id}/\",\n    \"method\": \"GET\",\n    \"description\": \"Get details of document by ID. Replace {id} with actual document ID.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/{id}/\",\n    \"method\": \"PATCH\",\n    \"description\": \"Update document by ID. Body: fields to update. Replace {id} with actual document ID.\"\n  },\n  {\n    \"endpoint\": \"/api/documents/{id}/\",\n    \"method\": \"DELETE\",\n    \"description\": \"Delete document by ID. Replace {id} with actual document ID.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/\",\n    \"method\": \"GET\",\n    \"description\": \"List all tags. Returns array of tags.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/\",\n    \"method\": \"POST\",\n    \"description\": \"Create a new tag. Body: {name, color, is_inbox_tag}.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/{id}/\",\n    \"method\": \"GET\",\n    \"description\": \"Get tag details by ID. Replace {id} with actual tag ID.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/{id}/\",\n    \"method\": \"PATCH\",\n    \"description\": \"Update tag by ID. Body: fields to update. Replace {id} with actual tag ID.\"\n  },\n  {\n    \"endpoint\": \"/api/tags/{id}/\",\n    \"method\": \"DELETE\",\n    \"description\": \"Delete tag by ID. Replace {id} with actual tag ID.\"\n  },\n  {\n    \"endpoint\": \"/api/correspondents/\",\n    \"method\": \"GET\",\n    \"description\": \"List all correspondents.\"\n  },\n  {\n    \"endpoint\": \"/api/document_types/\",\n    \"method\": \"GET\",\n    \"description\": \"List all document types.\"\n  }\n];\n\n// Search query from AI agent\nconst searchQuery = query.toLowerCase();\n\n// Search through endpoints\nconst matches = endpoints.filter(ep => {\n  const searchText = `${ep.endpoint} ${ep.method} ${ep.description}`.toLowerCase();\n  return searchText.includes(searchQuery);\n});\n\nif (matches.length === 0) {\n  return `No matching endpoints for: \"${query}\". Available: documents (list/create/get/update/delete), tags (list/create/get/update/delete), correspondents, document_types.`;\n}\n\n// Return formatted results\nreturn matches.map(ep => \n  `Endpoint: ${ep.endpoint}\\nMethod: ${ep.method}\\nDescription: ${ep.description}\\n⚠️ IMPORTANT: URL must end with trailing slash!`\n).join('\\n\\n---\\n\\n');"
+        "mode": "retrieve-as-tool",
+        "toolDescription": "## Each listed item represents a http request tool node for an endpoint. \nUse this tool to find out how to use them in detail\n\n### __Document Management__\n\n- `GET /api/documents/` - List/search documents (with query, custom field filters, pagination)\n- `POST /api/documents/` - Create document (metadata only)\n- `GET /api/documents/{id}/` - Get document details by ID\n- `PATCH /api/documents/{id}/` - Update document by ID\n- `DELETE /api/documents/{id}/` - Delete document by ID\n- `POST /api/documents/post_document/` - Upload document file (multipart/form-data)\n- `POST /api/documents/bulk_edit/` - Bulk operations on documents (edit, delete, reprocess, etc.)\n\n### 🔎 __Search & Discovery__\n- `GET /api/search/autocomplete/` - Get search autocompletions\n\n### 🏷️ __Tags Management__\n\n- `GET /api/tags/` - List all tags\n- `POST /api/tags/` - Create new tag\n- `GET /api/tags/{id}/` - Get tag details by ID\n- `PATCH /api/tags/{id}/` - Update tag by ID\n- `DELETE /api/tags/{id}/` - Delete tag by ID\n\n### 👤 __Correspondents__\n\n- `GET /api/correspondents/` - List all correspondents\n- `POST /api/correspondents/` - Create correspondent\n- `GET /api/correspondents/{id}/` - Get correspondent by ID\n- `PATCH /api/correspondents/{id}/` - Update correspondent by ID\n- `DELETE /api/correspondents/{id}/` - Delete correspondent by ID\n",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "topK": 10,
+        "includeDocumentMetadata": false,
+        "options": {
+          "pineconeNamespace": "paperless-ngx"
+        }
       },
-      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
       "typeVersion": 1.3,
       "position": [
-        1536,
-        208
+        1440,
+        160
       ],
-      "id": "419da04b-0c3b-4eeb-9a3a-6419f8d49b83",
-      "name": "Paperless API Reference"
+      "id": "ccceb5d3-47e0-4682-b9c0-5a2320f2dd9d",
+      "name": "API Knowledge",
+      "credentials": {
+        "pineconeApi": {
+          "id": "8VNDn02p6ppfW9SE",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "a2555866-99de-4ca6-8bb9-2e31fe7bc91c",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "position": [
+        1520,
+        368
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tF3b7R5rpvviQFUy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        160
+      ],
+      "id": "bc234b78-192e-484c-bddf-08210dab0ddb",
+      "name": "Mistral Small",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "kNQ7m533yrqJvU91",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('SetVars').item.json.uid }}",
+        "tableName": "papeercuts-no-more-history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1184,
+        160
+      ],
+      "id": "49b42385-294f-4088-88ab-9419f7dcbc4f",
+      "name": "Memory",
+      "credentials": {
+        "postgres": {
+          "id": "YyjbMEiZcSjBJXVT",
+          "name": "Postgres account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -146,17 +179,6 @@
           {
             "node": "SetVars",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Paperless API": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -184,7 +206,7 @@
         ]
       ]
     },
-    "Paperless API Reference": {
+    "API Knowledge": {
       "ai_tool": [
         [
           {
@@ -195,12 +217,34 @@
         ]
       ]
     },
-    "Ollama": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "API Knowledge",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Small": {
       "ai_languageModel": [
         [
           {
             "node": "AI Agent",
             "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
             "index": 0
           }
         ]
@@ -211,10 +255,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "78c51c1d-7d0f-440c-9f2f-a09790861dec",
+  "versionId": "6023ff47-52f0-4702-a22c-a4740dc81e77",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "0502105a008b8d0aa2a88bc1febee828a6393a5d44440d6592e401074a0219d6"
+    "instanceId": "8e8ac971ac9744092d324a6701c164e676a104893ee6f7ec18539f179778a68a"
   },
   "id": "R509dF9nVfQke3vl",
   "tags": []
