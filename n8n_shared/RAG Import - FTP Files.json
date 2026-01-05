@@ -1,0 +1,187 @@
+{
+  "name": "RAG Import - FTP Files",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "options": {
+          "clearNamespace": true,
+          "pineconeNamespace": "paperless-ngx"
+        }
+      },
+      "id": "1fd9ea3c-7996-4c80-824e-ae2f7709f35b",
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        48,
+        -80
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "8VNDn02p6ppfW9SE",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "1e912a3c-dde5-4318-a1a4-373990899c3b",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "position": [
+        16,
+        144
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tF3b7R5rpvviQFUy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "98dd5b65-d348-404d-9802-3aaad5fcf8ed",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        144,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100,
+        "options": {}
+      },
+      "id": "7fec5d46-38fc-472f-97a1-40984407033c",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        224,
+        352
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -80
+      ],
+      "id": "773b9092-df23-4fb7-80d7-9554078edda3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "path": "paperless-ngx-api-endpoints.md",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -80
+      ],
+      "id": "ffed2730-db85-4208-be88-6e96cc95aac9",
+      "name": "FTP",
+      "credentials": {
+        "ftp": {
+          "id": "0LZyMeRoAisFbxyp",
+          "name": "FTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "FTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FTP": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "5995dcfc-7a88-4363-9966-7067bf90011d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8e8ac971ac9744092d324a6701c164e676a104893ee6f7ec18539f179778a68a"
+  },
+  "id": "eMyLrWXUfSRhXDH9",
+  "tags": [
+    {
+      "updatedAt": "2026-01-05T10:13:08.849Z",
+      "createdAt": "2026-01-05T10:13:08.849Z",
+      "id": "VSJXjBkzPLGvIksK",
+      "name": "personal"
+    }
+  ]
+}
