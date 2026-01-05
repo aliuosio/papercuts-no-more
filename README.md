@@ -36,6 +36,7 @@ docker compose up -d
 - **📄 Paperless-ngx**: http://localhost:8010 (admin/admin123)
 - **⚙️ n8n Workflows**: http://localhost:5678
 - **📷 Scanner**: http://localhost:8080
+- **🔄 FTP Server**: ftp://localhost:21 (ftpuser/secureftp123)
 - **🤖 Ollama API**: http://localhost:11434
 
 ## 🏗️ Core Components
@@ -44,8 +45,8 @@ docker compose up -d
 |-----------|----------|------|------------|
 | Paperless-ngx | Document management & OCR | 8010 | Django + PostgreSQL |
 | n8n | Workflow automation & AI chat | 5678 | Node.js |
-| Ollama | Local AI models | 11434 | Go + CUDA/CPU |
 | Scanservjs | Document scanning | 8080 | Node.js |
+| ProFTPD | File transfer service | 21 | ProFTPD |
 | PostgreSQL | Data storage | 5432 | PostgreSQL |
 | Redis | Caching & messaging | 6379 | Redis |
 

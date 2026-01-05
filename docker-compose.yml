@@ -84,6 +84,23 @@ services:
     privileged: true
     network_mode: "host"
 
+  ftp:
+    container_name: ${NAMESPACE}_ftp
+    image: kibatic/proftpd
+    pull_policy: always
+    network_mode: "host"
+    restart: unless-stopped
+    environment:
+      FTP_LIST: "ftpuser:${FTP_PASSWORD:-ftppassword}"
+      USERADD_OPTIONS: "-o --gid 33 --uid 33"
+      PASSIVE_MIN_PORT: 50000
+      PASSIVE_MAX_PORT: 50100
+    volumes:
+      - ./.docker/webserver/volumes/consume:/home/ftpuser
+    ports:
+      - 21:21
+      - 50000-50100:50000-50100
+
 volumes:
   redis_data:
   n8n_data:
