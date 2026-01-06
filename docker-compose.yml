@@ -88,7 +88,6 @@ services:
     container_name: ${NAMESPACE}_ftp
     image: kibatic/proftpd
     pull_policy: always
-    restart: unless-stopped
     environment:
       FTP_LIST: "ftpuser:${FTP_PASSWORD:-ftppassword}"
       USERADD_OPTIONS: "-o --gid 33 --uid 33"
